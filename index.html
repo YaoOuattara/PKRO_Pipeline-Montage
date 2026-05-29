@@ -623,6 +623,11 @@ async function load(){
     dbReady=true;
     const hasData=projects.length>0||Object.keys(allData).length>0;
     showPill("✓ "+projects.length+" projet(s) chargé(s)");
+    // Update the projects screen header with connection status
+    const connEl=document.getElementById("conn-status");
+    if(connEl) connEl.textContent=projects.length===0
+      ? "✓ Connecté à Supabase — Aucun projet en base. Créez vos projets ci-dessous."
+      : "✓ Connecté — "+projects.length+" projet(s) synchronisé(s)";
     console.log("Supabase loaded:",{projects:projects.length,formDataRows:Object.keys(allData).length,config:config.length});
   } catch(e){
     console.error("Supabase load error:",e);
