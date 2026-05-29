@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>PKRO — Formulaires</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap');
+:root{
+  --bg:#F2EDE3;--surface:#F8F5EF;--card:#fff;
+  --border:#DDD6C8;--border-dk:#C4BAA8;
+  --ink:#1C1A14;--mid:#56524A;--muted:#96918A;--faint:#C4BFB6;
+  --gold:#8B6A18;--gold-dk:#B8900D;--gold-lt:#F5EDD4;--gold-pale:#FBF8EE;
+  --red:#8B1E1E;--red-pale:#FDF3F3;
+  --blue:#1A3870;--blue-pale:#EEF2FB;
+  --green:#1A5828;--green-pale:#EFF7F2;
+  --grey:#F0EDE6;
+  --admin:#6A1B9A;--admin-pale:#F5EEF9;--admin-lt:#CE93D8;
+  --cp-bg:#E8F0FE;--cp-tx:#1A3A8B;
+  --af-bg:#E6F4EA;--af-tx:#1A5828;
+  --rf-bg:#FDF4E8;--rf-tx:#8B4E00;
+  --rj-bg:#FDF3F3;--rj-tx:#8B1E1E;
+  --rc-bg:#F5EEF9;--rc-tx:#5A1A80;
+  --eq-bg:#F5EDD4;--eq-tx:#8B6A18;
+  --tap:48px; /* minimum touch target */
+  --radius:10px;
+  --shadow:0 2px 16px rgba(28,26,20,.10);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{height:100%;overflow:hidden}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--ink);height:100%;overflow:hidden;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+
+/* ══ SCREENS ══════════════════════════════════════════════════════════════════ */
+.screen{display:none;flex-direction:column;height:100%}
+.screen.active{display:flex}
+
+/* ══ TOP BAR ══════════════════════════════════════════════════════════════════ */
+.topbar{background:var(--ink);display:flex;align-items:center;padding:0 16px;height:56px;flex-shrink:0;gap:10px;position:relative;z-index:50}
+.topbar-logo{width:36px;height:36px;border-radius:8px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.1);position:relative;cursor:pointer}
+.topbar-logo img{width:100%;height:100%;object-fit:contain;display:none}
+.topbar-logo span{font-size:9px;color:rgba(255,255,255,.4);text-align:center;line-height:1.1}
+.topbar-logo input[type=file]{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+.topbar-title{flex:1;min-width:0}
+.topbar-brand{font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;font-weight:700;color:#fff;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar-sub{font-size:10px;color:rgba(255,255,255,.45);letter-spacing:.1em;text-transform:uppercase;margin-top:1px}
+.topbar-actions{display:flex;gap:6px;flex-shrink:0}
+.icon-btn{width:40px;height:40px;border-radius:8px;border:none;background:rgba(255,255,255,.1);color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.icon-btn:active{background:rgba(255,255,255,.25)}
+.icon-btn.admin-on{background:var(--admin)}
+
+/* ══ PROJECTS SCREEN ══════════════════════════════════════════════════════════ */
+#projects-screen .body{flex:1;overflow-y:auto;padding:16px;-webkit-overflow-scrolling:touch}
+
+.new-proj-card{background:var(--card);border:1.5px dashed var(--border-dk);border-radius:var(--radius);padding:16px;margin-bottom:20px}
+.new-proj-card h3{font-size:13px;font-weight:600;color:var(--mid);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px}
+.field-stack{display:flex;flex-direction:column;gap:10px}
+.inp{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:13px 14px;font-size:15px;font-family:'DM Sans',sans-serif;color:var(--ink);-webkit-appearance:none;appearance:none}
+.inp:focus{outline:none;border-color:var(--gold)}
+.inp::placeholder{color:var(--faint)}
+.btn-full{width:100%;padding:14px;border:none;border-radius:8px;font-size:15px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;transition:all .15s;margin-top:4px}
+.btn-gold{background:var(--gold);color:#fff}
+.btn-gold:active{background:var(--gold-dk)}
+.btn-primary{background:var(--ink);color:#fff}
+.btn-primary:active{opacity:.85}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--mid)}
+.btn-ghost:active{background:var(--grey)}
+.btn-admin{background:var(--admin);color:#fff}
+.btn-admin:active{opacity:.85}
+.btn-danger{background:transparent;border:1px solid rgba(139,30,30,.3);color:var(--red)}
+
+.projects-list{display:flex;flex-direction:column;gap:12px}
+.proj-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+.proj-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.proj-ref{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+.proj-pct{font-size:11px;font-weight:600}
+.proj-name{font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;font-weight:700;color:var(--ink);margin-bottom:2px;line-height:1.2}
+.proj-type{font-size:12px;color:var(--muted);margin-bottom:10px}
+.pbar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:10px}
+.pbar-fill{height:100%;border-radius:2px;transition:width .3s}
+.proj-date{font-size:11px;color:var(--faint);margin-bottom:12px}
+.proj-actions{display:grid;grid-template-columns:1fr auto auto;gap:8px}
+.proj-open{padding:12px;border:none;border-radius:8px;background:var(--ink);color:#fff;font-size:14px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;transition:opacity .15s}
+.proj-open:active{opacity:.8}
+.proj-icon-btn{width:44px;height:44px;border-radius:8px;border:1px solid var(--border);background:transparent;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.proj-icon-btn:active{background:var(--grey)}
+.proj-icon-btn.del{border-color:rgba(139,30,30,.25);color:var(--red)}
+
+.empty-state{text-align:center;padding:48px 20px;color:var(--muted)}
+.empty-icon{font-size:44px;opacity:.25;margin-bottom:12px}
+
+/* ══ FORM SCREEN ══════════════════════════════════════════════════════════════ */
+/* Project info bar */
+.proj-bar{background:rgba(255,255,255,.08);border-top:1px solid rgba(255,255,255,.1);padding:6px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.proj-bar-name{font-size:13px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60%}
+.proj-bar-ref{font-size:10px;color:rgba(255,255,255,.4);letter-spacing:.08em}
+
+/* Admin banner */
+.admin-banner{display:none;background:var(--admin);color:#fff;padding:8px 16px;font-size:12px;font-weight:500;text-align:center;flex-shrink:0}
+.admin-banner.on{display:block}
+
+/* Form nav — horizontal scroll */
+.form-nav{background:var(--surface);border-bottom:1px solid var(--border);display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-shrink:0;scrollbar-width:none}
+.form-nav::-webkit-scrollbar{display:none}
+.form-nav-btn{flex-shrink:0;padding:0 16px;height:52px;border:none;border-bottom:3px solid transparent;background:transparent;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;transition:all .13s;min-width:72px}
+.form-nav-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
+.form-nav-btn .fnb-code{font-size:10px;font-weight:700;letter-spacing:.08em}
+.form-nav-btn .fnb-prog{width:28px;height:2px;background:var(--border);border-radius:1px;overflow:hidden}
+.form-nav-btn .fnb-fill{height:100%;border-radius:1px;transition:width .3s}
+
+/* Form header */
+.form-header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 16px;flex-shrink:0}
+.fh-row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px}
+.fh-code{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:3px}
+.fh-title{font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;font-weight:700;color:var(--ink);line-height:1.2}
+.fh-right{min-width:80px;text-align:right;flex-shrink:0}
+.fh-pct-big{font-size:22px;font-weight:700;line-height:1}
+.fh-pct-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:1px}
+.fh-pbar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:6px}
+.fh-pfill{height:100%;border-radius:2px;transition:width .3s}
+.fh-out{padding:7px 10px;background:var(--blue-pale);border-left:3px solid var(--blue);border-radius:0 4px 4px 0;font-size:11px;color:var(--blue);display:flex;flex-wrap:wrap;gap:4px;align-items:baseline}
+.fh-out-l{font-weight:700;font-size:9.5px;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap}
+
+/* Section tabs */
+.sec-tabs{display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;scrollbar-width:none}
+.sec-tabs::-webkit-scrollbar{display:none}
+.sec-tab{flex-shrink:0;padding:10px 16px;border:none;border-bottom:2px solid transparent;background:transparent;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .13s}
+.sec-tab.active{color:var(--gold);border-bottom-color:var(--gold);font-weight:600}
+
+/* Fields scroll area */
+.fields-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px;padding-bottom:80px}
+
+/* Field card — mobile optimized */
+.field-card{background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden}
+.field-card-header{display:flex;align-items:center;gap:8px;padding:11px 13px;background:var(--grey)}
+.field-card-header.obl{background:var(--gold-pale)}
+.field-label-text{flex:1;font-size:14px;font-weight:500;color:var(--ink);line-height:1.3}
+.field-card-header.obl .field-label-text{color:var(--gold);font-weight:600}
+.field-status{font-size:11px;font-weight:700;flex-shrink:0}
+.field-status.obl{color:var(--gold)}
+.field-status.comp{color:var(--faint)}
+.role-chip{font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;flex-shrink:0}
+.chip-CP{background:var(--cp-bg);color:var(--cp-tx)}
+.chip-AF{background:var(--af-bg);color:var(--af-tx)}
+.chip-RF{background:var(--rf-bg);color:var(--rf-tx)}
+.chip-RJ{background:var(--rj-bg);color:var(--rj-tx)}
+.chip-RC{background:var(--rc-bg);color:var(--rc-tx)}
+.chip-EQ{background:var(--eq-bg);color:var(--eq-tx)}
+.field-type-tag{font-size:10px;color:var(--muted);font-style:italic;padding:0 13px 6px;background:var(--grey)}
+.field-card-header.obl + .field-type-tag{background:var(--gold-pale)}
+.field-body{padding:10px 13px}
+.field-note{font-size:11.5px;color:var(--red);background:var(--red-pale);border:1px solid rgba(139,30,30,.15);border-radius:6px;padding:6px 10px;margin-bottom:8px}
+.field-adv{font-size:11px;color:var(--muted);font-style:italic;margin-bottom:6px}
+
+/* Mobile inputs — large tap targets */
+input[type=text],input[type=number],input[type=date]{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:13px 14px;font-size:16px;font-family:'DM Sans',sans-serif;color:var(--ink);-webkit-appearance:none;appearance:none;transition:border-color .13s}
+input:focus{outline:none;border-color:var(--gold);background:var(--card)}
+input::placeholder{color:var(--faint)}
+select{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:13px 14px;font-size:16px;font-family:'DM Sans',sans-serif;color:var(--ink);-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7'%3E%3Cpath d='M0 0l6 7 6-7z' fill='%2396918A'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;transition:border-color .13s}
+select:focus{outline:none;border-color:var(--gold)}
+textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:13px 14px;font-size:16px;font-family:'DM Sans',sans-serif;color:var(--ink);resize:none;min-height:90px;line-height:1.6;-webkit-appearance:none;transition:border-color .13s}
+textarea:focus{outline:none;border-color:var(--gold);background:var(--card)}
+textarea::placeholder{color:var(--faint)}
+
+/* Radio options — large tap targets */
+.radio-opts{display:flex;flex-direction:column;gap:6px}
+.radio-opt{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all .13s;-webkit-tap-highlight-color:transparent}
+.radio-opt.selected{background:var(--gold-pale);border-color:var(--gold)}
+.radio-opt input{width:18px;height:18px;accent-color:var(--gold);flex-shrink:0;cursor:pointer}
+.radio-opt span{font-size:14px;color:var(--ink);line-height:1.3}
+
+/* Section extras */
+.section-label{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin:20px 0 10px;display:flex;align-items:center;gap:8px}
+.section-label::after{content:"";flex:1;height:1px;background:var(--border)}
+.pieces-box{background:var(--green-pale);border-left:3px solid var(--green);border-radius:0 8px 8px 0;padding:12px 14px;margin-bottom:10px}
+.pieces-t{font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.1em;margin-bottom:9px}
+.piece-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(26,88,40,.1);font-size:13px;color:var(--mid)}
+.piece-item:last-child{border-bottom:none}
+.piece-item input[type=checkbox]{width:20px;height:20px;accent-color:var(--green);flex-shrink:0}
+.obs-box{background:var(--grey);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px}
+.obs-t{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.sig-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.sig-cell{background:var(--gold-pale);border-radius:8px;padding:10px 12px}
+.sig-lbl{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+
+/* Nav row */
+.nav-row{display:flex;gap:10px;padding:12px 16px;background:var(--surface);border-top:1px solid var(--border);flex-shrink:0}
+.nav-btn{flex:1;padding:13px;border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;transition:all .13s;border:none;text-align:center}
+.nav-btn:disabled{opacity:.3;cursor:default}
+
+/* Admin field card */
+.field-card.admin-mode .field-card-header{cursor:pointer}
+.field-card.admin-mode .field-card-header:active{opacity:.8}
+.admin-edit-panel{display:none;padding:12px;background:var(--admin-pale);border-top:1px solid var(--admin-lt)}
+.admin-edit-panel.open{display:block}
+.aep-field{margin-bottom:10px}
+.aep-label{font-size:10px;font-weight:700;color:var(--admin);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:4px}
+.aep-input{width:100%;border:1px solid var(--admin-lt);border-radius:8px;padding:11px 13px;font-size:15px;font-family:'DM Sans',sans-serif;color:var(--ink);background:#fff;-webkit-appearance:none}
+.aep-input:focus{outline:none;border-color:var(--admin)}
+.aep-btns{display:flex;gap:8px;margin-top:10px}
+.aep-btn{flex:1;padding:12px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;border:none}
+.aep-save{background:var(--admin);color:#fff}
+.aep-del{background:transparent;border:1px solid var(--red)!important;color:var(--red)}
+.aep-cancel{background:var(--grey);color:var(--mid)}
+.aep-actions{display:flex;gap:6px;margin-top:8px}
+.aep-small{padding:8px 12px;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--mid)}
+
+.admin-add-btn{width:100%;padding:13px;background:var(--admin-pale);border:1.5px dashed var(--admin-lt);border-radius:8px;color:var(--admin);font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:8px;display:none}
+.admin-on .admin-add-btn{display:block}
+.form-admin-panel{display:none;background:var(--admin-pale);border:1.5px dashed var(--admin-lt);border-radius:10px;padding:14px;margin-bottom:14px}
+.admin-on .form-admin-panel{display:block}
+.fab-title{font-size:10px;font-weight:700;color:var(--admin);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+
+/* ══ BOTTOM SHEET / DRAWER ══════════════════════════════════════════════════ */
+.overlay{display:none;position:fixed;inset:0;background:rgba(28,26,20,.55);z-index:100}
+.overlay.open{display:flex;align-items:flex-end}
+.drawer{background:var(--card);border-radius:16px 16px 0 0;width:100%;max-height:85vh;overflow-y:auto;padding:20px 20px 32px;animation:slideUp .25s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.drawer-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px}
+.drawer-title{font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;font-weight:700;color:var(--ink);margin-bottom:5px}
+.drawer-desc{font-size:13px;color:var(--mid);margin-bottom:16px;line-height:1.5}
+.drawer-opts{display:flex;flex-direction:column;gap:8px}
+.drawer-opt{padding:14px 16px;border:1px solid var(--border);border-radius:10px;cursor:pointer;background:var(--card);text-align:left;font-family:'DM Sans',sans-serif;-webkit-tap-highlight-color:transparent;transition:background .1s}
+.drawer-opt:active{background:var(--gold-pale)}
+.drawer-opt strong{display:block;font-size:14px;color:var(--ink);margin-bottom:1px}
+.drawer-opt span{font-size:12px;color:var(--muted)}
+.drawer-close{width:100%;padding:14px;background:var(--grey);border:none;border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;margin-top:10px;color:var(--mid)}
+
+/* Add field drawer fields */
+.field-row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* Save indicator */
+.save-pill{position:fixed;top:64px;left:50%;transform:translateX(-50%);background:var(--green);color:#fff;padding:7px 16px;border-radius:20px;font-size:12px;font-weight:600;opacity:0;transition:opacity .3s;z-index:200;pointer-events:none;white-space:nowrap}
+.save-pill.show{opacity:1}
+
+@media(min-width:640px){
+  .field-stack{flex-direction:row;flex-wrap:wrap}
+  .field-stack .inp,.field-stack select{width:auto;flex:1;min-width:160px}
+  .btn-full{width:auto;padding:13px 24px}
+  .new-proj-card .field-stack{align-items:flex-end}
+}
+</style>
+</head>
+<body>
+
+<div class="save-pill" id="save-pill">✓ Sauvegardé</div>
+
+<!-- ══ PROJECTS SCREEN ════════════════════════════════════════════════════════ -->
+<div class="screen active" id="projects-screen">
+  <div class="topbar">
+    <div class="topbar-logo" id="pm-logo" title="Logo Property Kro — appuyer pour changer">
+      <img id="pm-logo-img" src="" alt="">
+      <span id="pm-logo-hint">PK</span>
+      <input type="file" accept="image/*" onchange="uploadLogo(event)">
+    </div>
+    <div class="topbar-title">
+      <div class="topbar-brand">Property Kro</div>
+      <div class="topbar-sub">Formulaires Source</div>
+    </div>
+    <div class="topbar-actions">
+      <button class="icon-btn" onclick="openDrawer('export-drawer')" title="Exporter">↓</button>
+      <button class="icon-btn" onclick="document.getElementById('import-cfg-file').click()" title="Importer config">↑</button>
+      <input type="file" id="import-cfg-file" accept=".json" style="display:none" onchange="importConfig(event)">
+    </div>
+  </div>
+
+  <div class="body" id="pm-body">
+    <!-- New project -->
+    <div class="new-proj-card" style="margin-bottom:20px">
+      <h3>Nouveau projet</h3>
+      <div class="field-stack">
+        <input class="inp" id="np-name" placeholder="Nom du projet *" onkeydown="if(event.key==='Enter')createProject()">
+        <input class="inp" id="np-ref"  placeholder="Référence (ex. PKR-2026-001)">
+        <select class="inp" id="np-type">
+          <option value="">— Type —</option>
+          <option>Immobilier résidentiel</option>
+          <option>Immobilier commercial</option>
+          <option>Foncier</option>
+          <option>Transformation</option>
+          <option>JV / Partenariat</option>
+          <option>Industriel</option>
+          <option>Mandat</option>
+        </select>
+        <button class="btn-full btn-gold" onclick="createProject()">+ Créer le projet</button>
+      </div>
+    </div>
+
+    <!-- Projects list -->
+    <div id="projects-list"></div>
+    <div id="empty-state" class="empty-state" style="display:none">
+      <div class="empty-icon">🏗</div>
+      <div style="font-size:18px;font-family:'Cormorant Garamond',serif;color:var(--mid);margin-bottom:6px">Aucun projet</div>
+      <div style="font-size:13px">Créez votre premier projet ci-dessus.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FORM SCREEN ════════════════════════════════════════════════════════════ -->
+<div class="screen" id="form-screen">
+  <div class="topbar">
+    <button class="icon-btn" onclick="backToProjects()" style="font-size:20px">←</button>
+    <div class="topbar-logo" style="cursor:default">
+      <img id="app-logo-img" src="" alt="">
+      <span id="app-logo-hint" style="font-size:9px;color:rgba(255,255,255,.4)">PK</span>
+    </div>
+    <div class="topbar-title">
+      <div class="topbar-brand" id="app-proj-name" style="font-size:15px"></div>
+      <div class="topbar-sub" id="app-proj-ref"></div>
+    </div>
+    <div class="topbar-actions">
+      <button class="icon-btn" onclick="openDrawer('export-drawer')" title="Exporter">↓</button>
+      <button class="icon-btn" id="admin-btn" onclick="toggleAdmin()" title="Admin">⚙</button>
+    </div>
+  </div>
+
+  <div class="admin-banner" id="admin-banner">MODE ADMIN — Modification de la structure</div>
+
+  <!-- Form tabs (F01-F12) -->
+  <div class="form-nav" id="form-nav"></div>
+
+  <!-- Form header -->
+  <div class="form-header" id="form-header">
+    <div class="fh-row">
+      <div>
+        <div class="fh-code" id="fh-code"></div>
+        <div class="fh-title" id="fh-title"></div>
+      </div>
+      <div class="fh-right">
+        <div class="fh-pct-big" id="fh-pct-big"></div>
+        <div class="fh-pct-lbl">complété</div>
+      </div>
+    </div>
+    <div class="fh-pbar"><div class="fh-pfill" id="fh-pfill"></div></div>
+    <div class="fh-out" id="fh-out" style="margin-top:8px"></div>
+  </div>
+
+  <!-- Section tabs -->
+  <div class="sec-tabs" id="sec-tabs"></div>
+
+  <!-- Fields -->
+  <div class="fields-scroll" id="fields-scroll">
+    <div id="fields-area" class=""></div>
+  </div>
+
+  <!-- Nav row -->
+  <div class="nav-row">
+    <button class="nav-btn btn-ghost" id="nav-prev" onclick="prevSec()">← Précédent</button>
+    <button class="nav-btn btn-primary" id="nav-next" onclick="nextSec()">Suivant →</button>
+  </div>
+</div>
+
+<!-- ══ EXPORT DRAWER ══════════════════════════════════════════════════════════ -->
+<div class="overlay" id="export-drawer" onclick="closeDrawer('export-drawer')">
+  <div class="drawer" onclick="event.stopPropagation()">
+    <div class="drawer-handle"></div>
+    <div class="drawer-title">Exporter</div>
+    <div class="drawer-opts">
+      <button class="drawer-opt" onclick="exportPDF()"><strong>📄 PDF — via impression</strong><span>Enregistrer en PDF depuis l'impression</span></button>
+      <button class="drawer-opt" onclick="exportData()"><strong>📦 JSON — Projet actif</strong><span>Toutes les réponses de ce projet</span></button>
+      <button class="drawer-opt" onclick="exportAllData()"><strong>📦 JSON — Tous les projets</strong><span>Backup complet</span></button>
+      <button class="drawer-opt" onclick="exportConfig()"><strong>⚙ JSON — Configuration</strong><span>Structure des fiches à partager avec l'équipe</span></button>
+      <button class="drawer-opt" onclick="exportCSV()"><strong>📊 CSV — Fiche active</strong><span>Pour Excel ou Google Sheets</span></button>
+      <button class="drawer-opt" onclick="copyText()"><strong>📋 Copier en texte</strong><span>Pour WhatsApp ou email</span></button>
+    </div>
+    <button class="drawer-close" onclick="closeDrawer('export-drawer')">Fermer</button>
+  </div>
+</div>
+
+<!-- ══ ADD FIELD DRAWER ═══════════════════════════════════════════════════════ -->
+<div class="overlay" id="add-field-drawer" onclick="closeDrawer('add-field-drawer')">
+  <div class="drawer" onclick="event.stopPropagation()">
+    <div class="drawer-handle"></div>
+    <div class="drawer-title">Ajouter un champ</div>
+    <div class="aep-field"><label class="aep-label">Libellé *</label><input class="aep-input" id="nfl" placeholder="ex. Budget de commercialisation"></div>
+    <div class="field-row-2">
+      <div class="aep-field">
+        <label class="aep-label">Type</label>
+        <select class="aep-input" id="nft" onchange="document.getElementById('nfo-wrap').style.display=(this.value==='select'||this.value==='radio')?'block':'none'">
+          <option value="text">Texte</option><option value="textarea">Texte long</option>
+          <option value="number">Nombre</option><option value="date">Date</option>
+          <option value="select">Liste</option><option value="radio">Choix</option>
+        </select>
+      </div>
+      <div class="aep-field">
+        <label class="aep-label">Statut</label>
+        <select class="aep-input" id="nfs"><option value="Obligatoire">★ Obligatoire</option><option value="Complémentaire">○ Complémentaire</option></select>
+      </div>
+    </div>
+    <div class="field-row-2">
+      <div class="aep-field">
+        <label class="aep-label">Rôle</label>
+        <select class="aep-input" id="nfr">
+          <option value="CP">CP</option><option value="AF">AF</option><option value="RF">RF</option>
+          <option value="RJ">RJ</option><option value="RC">RC</option><option value="EQ">EQ</option>
+        </select>
+      </div>
+    </div>
+    <div class="aep-field"><label class="aep-label">Texte d'aide</label><input class="aep-input" id="nfh" placeholder="ex. En FCFA, hors TVA"></div>
+    <div id="nfo-wrap" style="display:none" class="aep-field"><label class="aep-label">Options (une par ligne)</label><textarea class="aep-input" id="nfo" rows="4" placeholder="Option 1&#10;Option 2&#10;Option 3"></textarea></div>
+    <div class="aep-btns">
+      <button class="aep-btn aep-cancel" onclick="closeDrawer('add-field-drawer')">Annuler</button>
+      <button class="aep-btn aep-save" onclick="saveNewField()">Ajouter</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ADD SECTION DRAWER ════════════════════════════════════════════════════ -->
+<div class="overlay" id="add-section-drawer" onclick="closeDrawer('add-section-drawer')">
+  <div class="drawer" onclick="event.stopPropagation()">
+    <div class="drawer-handle"></div>
+    <div class="drawer-title">Ajouter une section</div>
+    <div class="aep-field"><label class="aep-label">Nom *</label><input class="aep-input" id="nsl" placeholder="ex. Informations complémentaires"></div>
+    <div class="aep-field">
+      <label class="aep-label">Rôle principal</label>
+      <select class="aep-input" id="nsr">
+        <option value="CP">CP — Chef de projet</option><option value="AF">AF — Analyste financier</option>
+        <option value="RF">RF — Resp. foncier</option><option value="RJ">RJ — Resp. juridique</option>
+        <option value="RC">RC — Resp. commercial</option><option value="EQ">EQ — Équipe</option>
+      </select>
+    </div>
+    <div class="aep-btns">
+      <button class="aep-btn aep-cancel" onclick="closeDrawer('add-section-drawer')">Annuler</button>
+      <button class="aep-btn aep-save" onclick="saveNewSection()">Ajouter</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CONSTANTS ─────────────────────────────────────────────────────────────────
+const ROLES={CP:{bg:"var(--cp-bg)",tx:"var(--cp-tx)",l:"Chef de projet"},AF:{bg:"var(--af-bg)",tx:"var(--af-tx)",l:"Analyste financier"},RF:{bg:"var(--rf-bg)",tx:"var(--rf-tx)",l:"Resp. foncier"},RJ:{bg:"var(--rj-bg)",tx:"var(--rj-tx)",l:"Resp. juridique"},RC:{bg:"var(--rc-bg)",tx:"var(--rc-tx)",l:"Resp. commercial"},EQ:{bg:"var(--eq-bg)",tx:"var(--eq-tx)",l:"Équipe"}};
+const O="Obligatoire",C="Complémentaire";
+
+const DEFAULT_CONFIG=[
+{code:"F01",title:"Fiche maître projet",desc:"Capturer l'identité du projet et créer le point d'entrée unique du pipeline.",outputs:["Tableau de bord","Screener V2","Investment Memo"],startWith:"F01 en premier — puis F02 et F04",pieces:["Note de présentation initiale","Lien data room","Email d'origine du deal"],sections:[
+{label:"Identification",role:"CP",fields:[[O,"CP","Nom du projet","text","ex. Projet Atome, Foncier 150ha",""],[O,"CP","Référence interne PKRO","text","Format : PKR-2026-001","À créer dès ouverture du dossier"],[O,"CP","Mode deal","radio","","",["Mode A — Fonds propres","Mode B — Mandat","Mode C — Hybride","À clarifier"]],[O,"CP","Type de projet","radio","","",["Immobilier résidentiel","Immobilier commercial","Foncier","Transformation","Mandat","JV / Partenariat","Industriel","Autre"]],[O,"CP","Géographie principale","text","Ville + commune + quartier",""],[O,"CP","Pays","select","","",["","Côte d'Ivoire","Sénégal","Ghana","Autre UEMOA","Autre Afrique de l'Ouest"]],[O,"CP","Description courte","textarea","Résumé 3-5 phrases : actif, localisation, objectif",""],[O,"CP","Stade du dossier","select","","",["","Pipeline","En cours d'analyse","Term sheet","Due diligence","Décision","Clôturé","Décliné"]],[O,"CP","Source","select","","",["","Approche directe","Réseau PKRO","Canal institutionnel","Référence","Sourcing proactif","Autre"]],[O,"CP","Date d'entrée au pipeline","date","",""],[O,"CP","Échéance de décision","date","JJ/MM/AAAA",""],]},
+{label:"Pilotage",role:"CP",fields:[[C,"CP","Responsable dossier PKRO","text","",""],[C,"CP","Niveau de confidentialité","select","","",["","Interne","Restreint","Confidentiel","Partage externe autorisé"]],[C,"CP","Type de sortie visée","select","","",["","Teaser banque","Teaser equity","Fiche pipeline","Mémo interne","Data room"]],[C,"CP","Verdict provisoire","select","","",["","Poursuivre","Pause","À arbitrer","Décliner"]],[C,"CP","Prochaine action","text","Action immédiate",""],[C,"CP","Deadline prochaine action","date","",""],[C,"CP","Contexte d'origine","textarea","Comment le projet est arrivé",""],]}
+]},
+{code:"F02",title:"Sponsor et emprunteur",desc:"Qualifier le porteur, sa capacité à exécuter et son autorité réelle sur l'actif.",outputs:["Screener V2 — Sponsor","Investment Memo","KYC"],startWith:"Après F01 — en parallèle avec F03",pieces:["Statuts / RCCM","Références projets","Justificatifs de pouvoirs"],sections:[
+{label:"Identité",role:"RJ",fields:[[O,"RJ","Nom du sponsor / emprunteur","text","Personne physique ou morale",""],[O,"RJ","Forme juridique","select","","",["","SCI","SARL","SA","SAS","Personne physique","Entité publique","Autre"]],[C,"RJ","RCCM / identifiant légal","text","",""],[C,"RJ","Capital social (FCFA)","number","",""],[C,"RJ","Associés / actionnaires","textarea","Nom + parts ou %",""],[C,"RJ","Gérants / dirigeants","text","",""],]},
+{label:"Autorité & Crédibilité",role:"CP",fields:[[O,"CP","Autorité sur l'actif","select","","Point critique — documenter obligatoirement",["","Propriétaire TF","Mandataire signé","Représentant légal","Option sur actif","Revendique sans preuve"]],[O,"CP","Contact principal","text","Nom · Téléphone · Email",""],[O,"CP","Décision nécessaire de PKRO","textarea","",""],[C,"CP","Historique de projets livrés","textarea","Références vérifiables",""],[C,"AF","Endettement actuel","textarea","",""],]}
+]},
+{code:"F03",title:"Contexte et investment story",desc:"Structurer le récit du projet, sa logique économique et son angle investisseur / banque.",outputs:["Investment Memo","Teaser banque","Teaser equity"],startWith:"Après F01 et F02 — structure le récit pour les sorties externes",pieces:["Note d'origine","Historique décisionnel"],sections:[
+{label:"Récit",role:"CP",fields:[[O,"CP","Origine du projet","textarea","Comment le projet est né",""],[O,"CP","Situation initiale","textarea","L'actif avant transformation",""],[O,"CP","Opportunité adressée","textarea","Quel besoin ou contrainte le projet adresse-t-il ?",""],[O,"CP","Objectif stratégique","text","",""],[O,"CP","Transformation envisagée","textarea","",""],[O,"CP","Synthèse exécutive 5 lignes","textarea","Version ultra-courte pour DG / investisseur",""],]},
+{label:"Thèse",role:"AF",fields:[[O,"AF","Rationale investisseur","textarea","Pourquoi un investisseur devrait regarder cette opportunité ?",""],[C,"AF","Rationale banque","textarea","",""],[C,"CP","Points différenciants","textarea","",""],[C,"CP","Risques narratifs à adresser","textarea","",""],]}
+]},
+{code:"F04",title:"Site et localisation",desc:"Documenter la localisation, les caractéristiques physiques du site et la logique de micro-localisation.",outputs:["Teaser — localisation","Investment Memo","Screener V2"],startWith:"Dès la première visite — indépendamment de F05",pieces:["Plan de localisation","Photos du site","Carte satellite"],sections:[
+{label:"Localisation",role:"RF",fields:[[O,"RF","Adresse / lieu-dit","text","",""],[O,"RF","Commune","text","",""],[O,"RF","Quartier","text","",""],[C,"RF","Coordonnées GPS","text","Ou lien Google Maps",""],[O,"RF","Accessibilité","textarea","Accès routier, axes, praticabilité",""],[O,"RF","Description de l'environnement","textarea","Voisinage, commodités proches",""],]},
+{label:"Caractéristiques",role:"RF",fields:[[O,"RF","Surface totale du terrain","number","En m² ou ha",""],[C,"RF","Références lots / parcelles","text","",""],[C,"RF","Atouts de micro-localisation","textarea","",""],[C,"RF","Contraintes du site","textarea","Topographie, nuisances, servitudes",""],[C,"RC","Commentaire marché local","textarea","",""],[C,"RF","Photos disponibles","select","","",["","Non","Oui — préciser localisation"]],]}
+]},
+{code:"F05",title:"Juridique et titres",desc:"Évaluer la sécurité juridique et la readiness administrative. Formulaire bloquant si statut foncier inconnu.",outputs:["Screener V2 — Faisabilité","Investment Memo — Risques","Dossier financement"],startWith:"Nécessite notaire ou conseil juridique — distinct de F04",pieces:["Titres fonciers / ACD / TF","Permis et autorisations","Avis juridique"],sections:[
+{label:"Statut Foncier",role:"RJ",fields:[[O,"RJ","Statut foncier","select","","Point bloquant si Inconnu",["","Titre Foncier (TF)","ACD","Lettre d'Attribution","En cours de régularisation","Inconnu","N/A"]],[O,"RJ","Références cadastrales","text","",""],[O,"RJ","Propriétaire légal actuel","text","",""],[O,"RJ","Charges ou hypothèques","textarea","Oui / Non — détailler si charge identifiée",""],[O,"RJ","Conformité documentaire initiale","select","","",["","Claire","Incomplète","Critique","À confirmer"]],]},
+{label:"Urbanisme & Risques",role:"RJ",fields:[[C,"RJ","Servitudes d'urbanisme","textarea","COS, hauteur, recul",""],[C,"RJ","Statut du permis","select","","",["","Obtenu","En cours","Non déposé","Non requis","À confirmer"]],[C,"RJ","Dépendances institutionnelles","textarea","Mairie, Ministère, BNETD, CIE, SODECI",""],[C,"RJ","Procédures en cours","textarea","Morcellement, mutation, bornage",""],[C,"RJ","Contentieux / litiges","textarea","Oui / Non — description si risque",""],[C,"RJ","Notaire en charge","text","",""],[C,"RJ","Readiness juridique","select","","",["","Faible","Moyen","Satisfaisant","Proche partage externe"]],]}
+]},
+{code:"F06",title:"Programme technique",desc:"Décrire le programme, vérifier la cohérence technique et cadrer les éléments de chiffrage.",outputs:["Compte d'exploitation","Teaser — programme","Dossier financement"],startWith:"Après F04 — nécessite l'architecte pour les champs avancés",pieces:["Plans architecturaux","Devis consolidé","Note technique"],sections:[
+{label:"Programme",role:"CP",fields:[[O,"CP","Nature des travaux","select","","",["","Construction neuve","Transformation","Rénovation","Extension","Démolition-reconstruction","Viabilisation"]],[O,"CP","Usage prévu","text","Résidentiel, locatif, commercial, mixte",""],[O,"CP","Description technique","textarea","Résumé : unités, typologies, logique spatiale",""],[O,"CP","Surface plancher totale (m²)","number","",""],[O,"CP","Nombre d'unités","number","",""],[O,"CP","Phasage technique","textarea","Découpage en phases — obligatoire si multi-phasé",""],[O,"CP","Architecte","text","Nom · Inscription à l'ordre · Références",""],]},
+{label:"Détail",role:"CP",fields:[[C,"CP","Typologies des unités","textarea","",""],[C,"AF","Surface vendable / louable (m²)","number","",""],[C,"CP","Emprise au sol / COS","text","ex. 360m² / 599m² = 60%",""],[C,"CP","Hauteur / niveaux","text","",""],[C,"CP","BET / MOEX / OPC","textarea","",""],[C,"CP","Entreprise travaux","text","",""],[C,"AF","Devis validé","select","","",["","Non","Oui — consolidé et daté"]],]}
+]},
+{code:"F07",title:"Étude de marché",desc:"Séparer les faits de marché observés des projections financières. Ce formulaire collecte des faits, pas des projections.",outputs:["Screener V2 — Marché","Investment Memo","Teaser"],startWith:"Avant F08 — les hypothèses de prix alimentent les recettes de F08",pieces:["Étude de marché","Tableau de comparables","Rapport d'expertise"],sections:[
+{label:"Sources",role:"RC",fields:[[O,"RC","Zone de marché","text","",""],[O,"RC","Segment de marché","text","Résidentiel, moyen standing, bureau",""],[O,"RC","Source de l'étude","text","",""],[O,"RC","Date de l'étude","date","","Étude > 18 mois = signal d'alerte"],]},
+{label:"Données",role:"RC",fields:[[O,"RC","Prix de vente — fourchette","text","ex. 588 à 970 KFCFA/m²",""],[O,"RC","Prix de vente retenu (FCFA/m²)","number","",""],[C,"RC","Loyers observés — fourchette","text","",""],[C,"AF","Rendement locatif estimé (%)","number","",""],[C,"RC","Taux d'absorption estimé","text","",""],]},
+{label:"Scénarios",role:"AF",fields:[[O,"AF","Hypothèses low / base / high","textarea","Versions prudente, centrale et optimiste","Fortement recommandé — indispensable pour le screening PKRO"],[C,"RC","Références comparables","textarea","Adresse · surface · prix · date",""],[C,"RC","Expertise immobilière indépendante","textarea","",""],[C,"RC","Concurrence directe","textarea","",""],]}
+]},
+{code:"F08",title:"Financier",desc:"Consolider les hypothèses financières et les indicateurs économiques. Distinguer illustratif de quantitatif.",outputs:["Screener V2 — Financier","Investment Memo","Teaser"],startWith:"Après F07 — champs avancés nécessitent un modèle financier",pieces:["Compte d'exploitation","Modèle financier","Tableau de sensibilités"],sections:[
+{label:"Cadrage",role:"AF",fields:[[O,"AF","Monnaie","text","FCFA par défaut",""],[O,"AF","Date du modèle","date","",""],[O,"AF","Mode de calcul","select","","Obligatoire — détermine la fiabilité",["","Illustratif (hypothèses estimées)","Quantitatif (modèle validé)","Mixte"]],[O,"AF","Coût total projet (FCFA)","number","",""],[O,"AF","Recettes totales attendues (FCFA)","number","",""],[O,"AF","Marge brute (FCFA)","number","",""],[O,"AF","Marge brute (%)","number","",""],]},
+{label:"Coûts",role:"AF",fields:[[C,"AF","Coût terrain (FCFA)","number","0 si terrain déjà acquis",""],[C,"AF","Coût construction (FCFA)","number","",""],[C,"AF","Honoraires techniques (FCFA)","number","",""],[C,"AF","Dépenses annexes (FCFA)","number","",""],[C,"AF","Contingency (FCFA)","number","","","[]",true],]},
+{label:"Indicateurs avancés",role:"AF",fields:[[C,"AF","TRI (%)","number","","Seuil PKRO Mode A : 20% immo · 18% industriel","[]",true],[C,"AF","VAN (FCFA)","number","","","[]",true],[C,"AF","Payback","text","En mois ou années","","[]",true],[C,"AF","Hypothèses critiques","textarea","","","[]",true],[C,"AF","Sensibilités principales","textarea","","","[]",true],]}
+]},
+{code:"F09",title:"Structure financement",desc:"Formaliser le besoin de financement, la structure cible et les points ouverts de négociation.",outputs:["Dossier financement","Investment Memo","Term sheet"],startWith:"Après F08 — peut être partagé à un financeur dès validation interne",pieces:["Lettre de demande","Plan de financement","Term sheets"],sections:[
+{label:"Structure",role:"AF",fields:[[O,"AF","Type de financement","select","","",["","Dette bancaire","Equity","Co-investissement","Bridge","Mandat","Combinaison"]],[O,"AF","Cible financeur","text","Banques, fonds, investisseurs",""],[O,"RJ","Emprunteur / SPV","text","",""],[O,"AF","Montant recherché (FCFA)","number","",""],[O,"AF","Fonds propres mobilisés","text","Montant FCFA et %",""],[O,"AF","Part dette","text","Montant FCFA et %",""],[O,"AF","LTC / LTV cible (%)","number","",""],[O,"AF","Taux cible (%)","number","ex. 8",""],[O,"AF","Durée","text","En mois ou années",""],]},
+{label:"Conditions",role:"AF",fields:[[C,"AF","Différé d'amortissement","text","ex. 12 mois",""],[C,"AF","Modalités de décaissement","text","",""],[C,"AF","Remboursement anticipé","select","","",["","Autorisé sans frais","Autorisé avec pénalités","Non autorisé"]],[C,"RJ","Garanties proposées","textarea","Hypothèque rang 1, nantissement, caution",""],[C,"AF","Statut de négociation","select","","",["","Aucun contact","En approche","En discussion","Term sheet","Offre reçue","Closing"]],[C,"AF","Points ouverts","textarea","",""],]}
+]},
+{code:"F10",title:"Équipe",desc:"Identifier les acteurs clés du projet et apprécier la capacité réelle d'exécution.",outputs:["Investment Memo","Teaser","Dossier financement"],startWith:"En parallèle avec F02 — distinguer sponsor (F02) des intervenants (F10)",pieces:["CV / références","Contrats / engagements","Organigramme"],sections:[
+{label:"Pilotage",role:"CP",fields:[[O,"CP","Sponsor lead","text","",""],[O,"CP","Maître d'ouvrage","text","",""],[O,"CP","Contact MOA","text","Nom · Téléphone · Email",""],[C,"CP","Project manager","text","",""],[C,"AF","Finance lead","text","",""],]},
+{label:"Intervenants",role:"CP",fields:[[C,"CP","Architecte","text","",""],[C,"CP","Entreprise travaux","text","",""],[C,"RC","Commercialisation","text","",""],[C,"RJ","Juridique / notaire","text","",""],[C,"CP","Gaps d'équipe","textarea","",""],]}
+]},
+{code:"F11",title:"Planning et readiness",desc:"Mettre le projet dans le temps et isoler les dépendances critiques avant exécution.",outputs:["Screener V2 — Faisabilité","Investment Memo","Suivi projet"],startWith:"Après F05 et F06 — dépend des autorisations et du programme",pieces:["Planning détaillé","Chronogramme","Liste des jalons"],sections:[
+{label:"Calendrier",role:"CP",fields:[[O,"CP","Date de démarrage","date","",""],[O,"CP","Durée totale estimée","text","En mois ou années",""],[O,"CP","Date de livraison cible","date","",""],[C,"AF","Date closing financement","date","",""],[C,"RJ","Date autorisations / permis","date","",""],[C,"RC","Date commercialisation","date","",""],[C,"AF","Date premières ventes / encaissements","date","",""],]},
+{label:"Risques",role:"CP",fields:[[C,"CP","Jalons critiques","textarea","",""],[C,"CP","Dépendances critiques","textarea","Permis, financement, titres, devis",""],[C,"CP","Timeline stressée (+30 à 50%)","text","Date de livraison scénario stress","Fortement recommandé pour projets en Côte d'Ivoire"],[C,"CP","Risques calendrier","textarea","",""],]},
+{label:"Pilotage",role:"CP",fields:[[C,"CP","Niveau global de readiness","select","","",["","Faible","Moyen","Satisfaisant","Prêt à engager"]],[C,"CP","Prochaine action","text","",""],[C,"CP","Owner","text","",""],[C,"CP","Échéance","date","",""],]}
+]},
+{code:"F12",title:"Data room",desc:"Suivre la complétude documentaire et identifier les pièces manquantes ou à mettre à jour.",outputs:["Screener V2 — Gaps","Due diligence","Investment Memo"],startWith:"À mettre à jour à chaque stade du dossier",pieces:["Lien data room","Checklist de suivi","Liste des gaps"],sections:[
+{label:"Statut",role:"CP",fields:[[O,"CP","Lien data room principal","text","URL du dossier maître partagé",""],[O,"CP","Statut data room","select","","",["","Complète","Partielle","En cours de constitution","Inexistante"]],[C,"CP","Responsable documentaire","text","",""],[C,"CP","Score de complétude","text","ex. 6/10",""],]},
+{label:"Inventaire",role:"CP",fields:[[C,"RJ","Documents fonciers","textarea","TF, ACD, actes — présents / manquants",""],[C,"RJ","Permis et autorisations","textarea","Permis, certificats — présents / manquants",""],[C,"CP","Documents techniques","textarea","Plans, devis — présents / manquants",""],[C,"AF","Documents financiers","textarea","CEP, plan financement — présents / manquants",""],[C,"RC","Études et expertises","textarea","Études, comparables — présents / manquants",""],[C,"RJ","Documents entité / sponsor","textarea","Statuts, RCCM, KYC — présents / manquants",""],]},
+{label:"Gaps Critiques",role:"CP",fields:[[O,"CP","Documents manquants — BLOQUANTS","textarea","Pièces absentes qui bloquent le screening ou la décision","À compléter avant tout avancement"],[C,"CP","Documents à mettre à jour","textarea","Pièces présentes mais obsolètes",""],[C,"CP","Documents manquants — importants","textarea","Utiles mais non bloquants",""],]}
+]},
+];
+
+
+// ── SUPABASE CONFIG ────────────────────────────────────────────────────────────
+const SUPABASE_URL = "https://ynrzlbpyjcrsyhqboxnr.supabase.co";
+const SUPABASE_KEY = "sb_publishable_VxHCUFP14FjsoKKojbPIUA_FWiAV5yL";
+
+// Supabase REST helpers
+const sb = {
+  headers: { "Content-Type":"application/json", "apikey":SUPABASE_KEY, "Authorization":"Bearer "+SUPABASE_KEY },
+  async get(table, params=""){
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/${table}?${params}`,{headers:sb.headers});
+    return r.ok?r.json():[];
+  },
+  async post(table, body){
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/${table}`,{method:"POST",headers:{...sb.headers,"Prefer":"return=representation"},body:JSON.stringify(body)});
+    return r.ok?r.json():null;
+  },
+  async patch(table, params, body){
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/${table}?${params}`,{method:"PATCH",headers:{...sb.headers,"Prefer":"return=representation"},body:JSON.stringify(body)});
+    return r.ok?r.json():null;
+  },
+  async del(table, params){
+    await fetch(`${SUPABASE_URL}/rest/v1/${table}?${params}`,{method:"DELETE",headers:sb.headers});
+  },
+  async upsert(table, body){
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/${table}`,{method:"POST",headers:{...sb.headers,"Prefer":"resolution=merge-duplicates,return=representation"},body:JSON.stringify(body)});
+    return r.ok?r.json():null;
+  }
+};
+
+// ── STATE ──────────────────────────────────────────────────────────────────────
+let projects=[],allData={},config=[],logoUrl="";
+let pid=null,aF=0,aS=0,adminMode=false,pendingSec=null,saveTimer=null,dbReady=false;
+
+// Show/hide sync indicator
+function showPill(msg,color="var(--green)"){
+  const pill=document.getElementById("save-pill");
+  pill.textContent=msg; pill.style.background=color;
+  pill.classList.add("show");clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>pill.classList.remove("show"),2000);
+}
+
+async function load(){
+  showPill("🔄 Connexion...", "var(--gold-dk)");
+  try{
+    // Load config from Supabase
+    const cfgRows = await sb.get("form_config","order=updated_at.desc&limit=1");
+    if(cfgRows?.length>0 && cfgRows[0].config_json){
+      config = typeof cfgRows[0].config_json==="string" ? JSON.parse(cfgRows[0].config_json) : cfgRows[0].config_json;
+    } else {
+      config = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+    }
+    // Load projects
+    const projRows = await sb.get("projects","order=created_at.desc");
+    projects = (projRows||[]).map(p=>({
+      id:p.id, name:p.name, ref:p.ref||"", type:p.type||"", createdAt:p.created_at
+    }));
+    // Load all form data
+    const dataRows = await sb.get("form_data","order=updated_at.desc");
+    allData={};
+    (dataRows||[]).forEach(row=>{
+      if(!allData[row.project_id])allData[row.project_id]={};
+      if(!allData[row.project_id][row.form_code])allData[row.project_id][row.form_code]={};
+      allData[row.project_id][row.form_code][row.field_key]=row.field_value||"";
+    });
+    // Logo from localStorage (device-specific, fine)
+    try{const l=localStorage.getItem("pkro_logo_v4");if(l){logoUrl=l;applyLogo()}}catch{}
+    dbReady=true;
+    showPill("✓ Connecté");
+  } catch(e){
+    console.error("Supabase load error:",e);
+    showPill("⚠ Mode hors-ligne","var(--red)");
+    // Fallback to localStorage
+    try{projects=JSON.parse(localStorage.getItem("pkro_proj_v4")||"[]")}catch{projects=[]}
+    try{allData=JSON.parse(localStorage.getItem("pkro_data_v4")||"{}")}catch{allData={}}
+    try{const c=localStorage.getItem("pkro_cfg_v4");config=c?JSON.parse(c):JSON.parse(JSON.stringify(DEFAULT_CONFIG))}catch{config=JSON.parse(JSON.stringify(DEFAULT_CONFIG))}
+  }
+}
+
+// Debounce timer per field
+const _debounce={};
+function saveAll(){ /* kept for compat — real saves go through sv() */ }
+
+function gv(k){return allData[pid]?.[config[aF]?.code]?.[k]??""}
+
+function sv(k,v){
+  const fc=config[aF].code;
+  if(!allData[pid])allData[pid]={};
+  if(!allData[pid][fc])allData[pid][fc]={};
+  allData[pid][fc][k]=v;
+  updProg();
+  // Debounced Supabase upsert
+  const dkey=pid+"_"+fc+"_"+k;
+  clearTimeout(_debounce[dkey]);
+  _debounce[dkey]=setTimeout(async()=>{
+    if(!dbReady){localStorage.setItem("pkro_data_v4",JSON.stringify(allData));return;}
+    showPill("💾 Sauvegarde...","var(--gold-dk)");
+    await sb.upsert("form_data",{project_id:pid,form_code:fc,field_key:k,field_value:v,updated_at:new Date().toISOString()});
+    showPill("✓ Sauvegardé");
+  },600);
+}
+
+async function saveConfig(){
+  if(!dbReady)return;
+  await sb.upsert("form_config",{id:"00000000-0000-0000-0000-000000000001",config_json:config,updated_at:new Date().toISOString()});
+}
+
+function mk(l){return l.toLowerCase().replace(/[^a-z0-9]/g,"_")}
+
+// ── LOGO ──────────────────────────────────────────────────────────────────────
+function uploadLogo(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{logoUrl=ev.target.result;localStorage.setItem("pkro_logo_v4",logoUrl);applyLogo()};
+  r.readAsDataURL(f);
+}
+function applyLogo(){
+  if(!logoUrl)return;
+  ["pm-logo-img","app-logo-img"].forEach(id=>{
+    const img=document.getElementById(id);
+    if(img){img.src=logoUrl;img.style.display="block"}
+  });
+  ["pm-logo-hint","app-logo-hint"].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.style.display="none";
+  });
+}
+
+// ── SCREENS ───────────────────────────────────────────────────────────────────
+function showScreen(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+// ── PROJECTS ──────────────────────────────────────────────────────────────────
+function renderProjects(){
+  const list=document.getElementById("projects-list"),empty=document.getElementById("empty-state");
+  list.innerHTML="";
+  if(projects.length===0){empty.style.display="block";return}
+  empty.style.display="none";
+  projects.forEach(p=>{
+    const pct=projPct(p.id),col=pctCol(pct);
+    const card=document.createElement("div");card.className="proj-card";
+    card.innerHTML=`
+      <div class="proj-card-header">
+        <div class="proj-ref">${p.ref||"PKRO"}</div>
+        <div class="proj-pct" style="color:${col}">${pct}%</div>
+      </div>
+      <div class="proj-name">${p.name}</div>
+      <div class="proj-type">${p.type||"Type non défini"}</div>
+      <div class="pbar"><div class="pbar-fill" style="width:${pct}%;background:${col}"></div></div>
+      <div class="proj-date">Créé le ${new Date(p.createdAt).toLocaleDateString("fr-FR")}</div>
+      <div class="proj-actions">
+        <button class="proj-open" onclick="openProject('${p.id}')">Ouvrir →</button>
+        <button class="proj-icon-btn" onclick="dupProject('${p.id}')" title="Dupliquer">⎘</button>
+        <button class="proj-icon-btn del" onclick="delProject('${p.id}')" title="Supprimer">✕</button>
+      </div>`;
+    list.appendChild(card);
+  });
+}
+
+function projPct(id){
+  let req=0,filled=0;
+  config.forEach(f=>f.sections.forEach(s=>s.fields.filter(f=>f[0]===O).forEach(f=>{
+    req++;const v=allData[id]?.[f[0]==="Obligatoire"?"":config[0]?.code]?.[mk(f[2])];
+    // simplified — just count total filled across all forms
+  })));
+  // Proper count
+  req=0;filled=0;
+  config.forEach(form=>form.sections.forEach(s=>s.fields.filter(f=>f[0]===O).forEach(f=>{
+    req++;const v=allData[id]?.[form.code]?.[mk(f[2])];
+    if(v&&v.toString().trim())filled++;
+  })));
+  return req===0?0:Math.round(filled/req*100);
+}
+
+async function createProject(){
+  const name=document.getElementById("np-name").value.trim();
+  if(!name){alert("Le nom du projet est requis.");return}
+  const ref=document.getElementById("np-ref").value.trim()||`PKR-${new Date().getFullYear()}-${String(projects.length+1).padStart(3,"0")}`;
+  const type=document.getElementById("np-type").value;
+  showPill("💾 Création...","var(--gold-dk)");
+  if(dbReady){
+    const rows=await sb.post("projects",{name,ref,type});
+    const row=Array.isArray(rows)?rows[0]:rows;
+    if(row){projects.unshift({id:row.id,name:row.name,ref:row.ref||"",type:row.type||"",createdAt:row.created_at});}
+  } else {
+    projects.unshift({id:"p_"+Date.now(),name,ref,type,createdAt:new Date().toISOString()});
+    localStorage.setItem("pkro_proj_v4",JSON.stringify(projects));
+  }
+  ["np-name","np-ref"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("np-type").value="";
+  showPill("✓ Projet créé");renderProjects();
+}
+
+async function dupProject(id){
+  const src=projects.find(p=>p.id===id);if(!src)return;
+  showPill("💾 Duplication...","var(--gold-dk)");
+  if(dbReady){
+    const rows=await sb.post("projects",{name:src.name+" (copie)",ref:src.ref+"-B",type:src.type});
+    const row=Array.isArray(rows)?rows[0]:rows;
+    if(row){
+      const nid=row.id;
+      projects.unshift({id:nid,name:row.name,ref:row.ref||"",type:row.type||"",createdAt:row.created_at});
+      // Duplicate form data
+      if(allData[id]){
+        allData[nid]=JSON.parse(JSON.stringify(allData[id]));
+        const upserts=[];
+        Object.entries(allData[id]).forEach(([fc,fields])=>{
+          Object.entries(fields).forEach(([fk,fv])=>{
+            upserts.push({project_id:nid,form_code:fc,field_key:fk,field_value:fv||""});
+          });
+        });
+        if(upserts.length) await sb.upsert("form_data",upserts);
+      }
+    }
+  } else {
+    const nid="p_"+Date.now();
+    projects.unshift({...src,id:nid,name:src.name+" (copie)",createdAt:new Date().toISOString()});
+    if(allData[id])allData[nid]=JSON.parse(JSON.stringify(allData[id]));
+  }
+  showPill("✓ Dupliqué");renderProjects();
+}
+
+async function delProject(id){
+  const p=projects.find(p=>p.id===id);
+  if(!confirm(`Supprimer "${p?.name}" ?`))return;
+  projects=projects.filter(p=>p.id!==id);delete allData[id];
+  if(dbReady){
+    await sb.del("projects",`id=eq.${id}`);
+    // form_data cascades automatically via FK
+  }
+  if(pid===id){pid=null;showScreen("projects-screen")}renderProjects();
+}
+
+function openProject(id){
+  pid=id;const p=projects.find(p=>p.id===id);
+  document.getElementById("app-proj-name").textContent=p.name;
+  document.getElementById("app-proj-ref").textContent=p.ref;
+  aF=0;aS=0;applyLogo();renderFormNav();renderHeader();renderFields();showScreen("form-screen");
+}
+
+function backToProjects(){showScreen("projects-screen");renderProjects()}
+
+// ── PROGRESS ──────────────────────────────────────────────────────────────────
+function getPct(){
+  const form=config[aF];
+  const reqs=form.sections.flatMap(s=>s.fields.filter(f=>f[0]===O));
+  const filled=reqs.filter(f=>{const v=allData[pid]?.[form.code]?.[mk(f[2])];return v&&v.toString().trim()});
+  return reqs.length===0?100:Math.round(filled.length/reqs.length*100);
+}
+function pctCol(p){return p===100?"var(--green)":p>=50?"var(--gold-dk)":"var(--red)"}
+function updProg(){
+  const pct=getPct(),col=pctCol(pct);
+  document.getElementById("fh-pct-big").textContent=pct+"%";
+  document.getElementById("fh-pct-big").style.color=col;
+  document.getElementById("fh-pfill").style.cssText=`width:${pct}%;background:${col}`;
+  renderFormNav();
+}
+
+// ── ADMIN ─────────────────────────────────────────────────────────────────────
+function toggleAdmin(){
+  adminMode=!adminMode;
+  document.getElementById("admin-btn").classList.toggle("admin-on",adminMode);
+  document.getElementById("admin-banner").classList.toggle("on",adminMode);
+  document.getElementById("fields-area").className=adminMode?"admin-on":"";
+  renderFields();
+}
+
+// ── FORM NAV ──────────────────────────────────────────────────────────────────
+function renderFormNav(){
+  const nav=document.getElementById("form-nav");nav.innerHTML="";
+  config.forEach((form,i)=>{
+    const pct=formPct(form,pid),col=pctCol(pct);
+    const btn=document.createElement("button");btn.className="form-nav-btn"+(i===aF?" active":"");
+    btn.innerHTML=`<div class="fnb-code">${form.code}</div><div class="fnb-prog"><div class="fnb-fill" style="width:${pct}%;background:${col}"></div></div>`;
+    btn.title=form.title;
+    btn.onclick=()=>{aF=i;aS=0;renderHeader();renderFields();renderFormNav();scrollToActiveTab()};
+    nav.appendChild(btn);
+  });
+  scrollToActiveTab();
+}
+function scrollToActiveTab(){
+  const nav=document.getElementById("form-nav");
+  const active=nav.querySelector(".active");
+  if(active)active.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});
+}
+function formPct(form,id){
+  const reqs=form.sections.flatMap(s=>s.fields.filter(f=>f[0]===O));
+  const filled=reqs.filter(f=>{const v=allData[id]?.[form.code]?.[mk(f[2])];return v&&v.toString().trim()});
+  return reqs.length===0?100:Math.round(filled.length/reqs.length*100);
+}
+
+// ── FORM HEADER ───────────────────────────────────────────────────────────────
+function renderHeader(){
+  const form=config[aF];
+  document.getElementById("fh-code").textContent=form.code;
+  document.getElementById("fh-title").textContent=form.title;
+  updProg();
+  document.getElementById("fh-out").innerHTML=`<span class="fh-out-l">Alimente :</span> ${form.outputs.join(" · ")}`;
+  const tabs=document.getElementById("sec-tabs");tabs.innerHTML="";
+  form.sections.forEach((s,i)=>{
+    const tab=document.createElement("button");tab.className="sec-tab"+(i===aS?" active":"");
+    tab.textContent=s.label+(adminMode?" ✏":"");
+    tab.onclick=()=>{aS=i;renderHeader();renderFields();tab.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"})};
+    tabs.appendChild(tab);
+  });
+  const prev=document.getElementById("nav-prev"),next=document.getElementById("nav-next");
+  const totalSecs=form.sections.length;
+  const isFirstSec=aS===0,isFirstForm=aF===0;
+  const isLastSec=aS===totalSecs-1,isLastForm=aF===config.length-1;
+  prev.disabled=isFirstSec&&isFirstForm;prev.style.opacity=(isFirstSec&&isFirstForm)?".3":"1";
+  next.disabled=isLastSec&&isLastForm;next.style.opacity=(isLastSec&&isLastForm)?".3":"1";
+  next.textContent=isLastSec?(isLastForm?"Terminé ✓":"Fiche suivante →"):"Suivant →";
+}
+
+function prevSec(){
+  if(aS>0){aS--;renderHeader();renderFields();document.getElementById("fields-scroll").scrollTop=0}
+  else if(aF>0){aF--;aS=config[aF].sections.length-1;renderFormNav();renderHeader();renderFields();document.getElementById("fields-scroll").scrollTop=0}
+}
+function nextSec(){
+  const form=config[aF];
+  if(aS<form.sections.length-1){aS++;renderHeader();renderFields();document.getElementById("fields-scroll").scrollTop=0}
+  else if(aF<config.length-1){aF++;aS=0;renderFormNav();renderHeader();renderFields();document.getElementById("fields-scroll").scrollTop=0}
+}
+
+// ── FIELDS ────────────────────────────────────────────────────────────────────
+function renderFields(){
+  const form=config[aF],section=form.sections[aS],fc=form.code;
+  const area=document.getElementById("fields-area");area.innerHTML="";
+  area.className=adminMode?"admin-on":"";
+
+  // Form admin panel
+  if(adminMode){
+    const fab=document.createElement("div");fab.className="form-admin-panel admin-on";
+    fab.innerHTML=`<div class="fab-title">⚙ Modifier cette fiche</div>
+    <div class="aep-field"><label class="aep-label">Titre</label><input class="aep-input" value="${form.title}" onchange="updFM('title',this.value)"></div>
+    <div class="aep-field"><label class="aep-label">Outputs (séparés par |)</label><input class="aep-input" value="${form.outputs.join('|')}" onchange="updFM('outputs',this.value)"></div>`;
+    area.appendChild(fab);
+  }
+
+  // Section label with admin controls
+  const sl=document.createElement("div");
+  if(adminMode){
+    sl.innerHTML=`<div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+      <input value="${section.label}" style="flex:1;border:1px solid var(--admin-lt);border-radius:8px;padding:10px 12px;font-size:14px;font-family:'DM Sans',sans-serif;font-weight:700;color:var(--gold);background:#fff" onchange="updSL(${aS},this.value)">
+      <select style="border:1px solid var(--admin-lt);border-radius:8px;padding:10px;font-size:13px;font-family:'DM Sans',sans-serif" onchange="updSR(${aS},this.value)">
+        ${Object.keys(ROLES).map(r=>`<option value="${r}"${r===section.role?" selected":""}>${r}</option>`).join("")}
+      </select>
+      <button onclick="delSec(${aS})" style="padding:10px;border-radius:8px;border:1px solid rgba(139,30,30,.3);color:var(--red);background:transparent;font-size:13px;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif">✕ Section</button>
+    </div>`;
+  } else {
+    sl.className="section-label";sl.innerHTML=`<span class="role-chip chip-${section.role}">${section.role}</span> ${section.label}`;
+  }
+  area.appendChild(sl);
+
+  // Fields
+  section.fields.forEach((f,fi)=>{
+    const[status,roleCode,label,type,hint="",note="",rawOpts=[],adv=false]=f;
+    const key=mk(label),val=gv(key),isObl=status===O;
+    const rData=ROLES[roleCode]||ROLES.CP;
+    let opts=Array.isArray(rawOpts)?rawOpts:[];
+    try{if(typeof rawOpts==="string"&&rawOpts.startsWith("["))opts=JSON.parse(rawOpts)}catch{}
+
+    const card=document.createElement("div");card.className="field-card"+(adminMode?" admin-mode":"");
+
+    if(adminMode){
+      const eid=`ed_${aS}_${fi}`;
+      const hdr=document.createElement("div");hdr.className=`field-card-header ${isObl?"obl":"comp"}`;
+      hdr.style.cursor="pointer";
+      hdr.innerHTML=`<div class="field-label-text">${label}</div><span class="field-status ${isObl?"obl":"comp"}">${isObl?"★":"○"}</span><span class="role-chip chip-${roleCode}">${roleCode}</span>`;
+      hdr.onclick=()=>document.getElementById(eid).classList.toggle("open");
+      card.appendChild(hdr);
+
+      const ep=document.createElement("div");ep.className="admin-edit-panel";ep.id=eid;
+      const optsStr=opts.filter(o=>o!=="").join("\n");
+      ep.innerHTML=`
+        <div class="aep-field"><label class="aep-label">Libellé *</label><input class="aep-input" id="${eid}_l" value="${label.replace(/"/g,"&quot;")}"></div>
+        <div class="field-row-2">
+          <div class="aep-field"><label class="aep-label">Type</label><select class="aep-input" id="${eid}_t" onchange="togOV('${eid}')">${["text","textarea","number","date","select","radio"].map(t=>`<option value="${t}"${t===type?" selected":""}>${t}</option>`).join("")}</select></div>
+          <div class="aep-field"><label class="aep-label">Statut</label><select class="aep-input" id="${eid}_s"><option value="Obligatoire"${isObl?" selected":""}>★ Obligatoire</option><option value="Complémentaire"${!isObl?" selected":""}>○ Complémentaire</option></select></div>
+        </div>
+        <div class="field-row-2">
+          <div class="aep-field"><label class="aep-label">Rôle</label><select class="aep-input" id="${eid}_r">${Object.keys(ROLES).map(r=>`<option value="${r}"${r===roleCode?" selected":""}>${r}</option>`).join("")}</select></div>
+          <div class="aep-field"><label class="aep-label">Avancé (DD)</label><select class="aep-input" id="${eid}_a"><option value="false"${!adv?" selected":""}>Non</option><option value="true"${adv?" selected":""}>Oui</option></select></div>
+        </div>
+        <div class="aep-field"><label class="aep-label">Texte d'aide</label><input class="aep-input" id="${eid}_h" value="${hint.replace(/"/g,"&quot;")}"></div>
+        <div class="aep-field"><label class="aep-label">Note d'alerte</label><input class="aep-input" id="${eid}_n" value="${note.replace(/"/g,"&quot;")}"></div>
+        <div id="${eid}_ow" style="display:${type==="select"||type==="radio"?"block":"none"}" class="aep-field"><label class="aep-label">Options (une par ligne)</label><textarea class="aep-input" id="${eid}_o" rows="4">${optsStr}</textarea></div>
+        <div class="aep-actions">
+          ${fi>0?`<button class="aep-small" onclick="movF(${aS},${fi},-1)">↑</button>`:""}
+          ${fi<section.fields.length-1?`<button class="aep-small" onclick="movF(${aS},${fi},1)">↓</button>`:""}
+        </div>
+        <div class="aep-btns">
+          <button class="aep-btn aep-del" onclick="delF(${aS},${fi})">Supprimer</button>
+          <button class="aep-btn aep-cancel" onclick="document.getElementById('${eid}').classList.remove('open')">Fermer</button>
+          <button class="aep-btn aep-save" onclick="saveF('${eid}',${aS},${fi})">Sauvegarder</button>
+        </div>`;
+      card.appendChild(ep);
+
+    } else {
+      // Normal card
+      const hdr=document.createElement("div");hdr.className=`field-card-header ${isObl?"obl":"comp"}`;
+      hdr.innerHTML=`<div class="field-label-text">${label}</div><span class="field-status ${isObl?"obl":"comp"}">${isObl?"★":"○"}</span><span class="role-chip chip-${roleCode}">${roleCode}</span>`;
+      card.appendChild(hdr);
+      const typeTag=document.createElement("div");typeTag.className="field-type-tag "+(isObl?"":"");
+      typeTag.style.background=isObl?"var(--gold-pale)":"var(--grey)";
+      typeTag.textContent=type==="textarea"?"Texte long":type==="radio"?"Choix unique":type==="select"?"Liste":type==="date"?"Date":type==="number"?"Nombre":"Texte";
+      card.appendChild(typeTag);
+
+      const body=document.createElement("div");body.className="field-body";
+      if(note)body.innerHTML+=`<div class="field-note">⚠ ${note}</div>`;
+      if(adv)body.innerHTML+=`<div class="field-adv">↳ Champ avancé — renseigner à partir de la due diligence</div>`;
+
+      if(type==="radio"||(type!=="select"&&opts.length>1)){
+        const wrap=document.createElement("div");wrap.className="radio-opts";
+        opts.filter(o=>o!=="").forEach(o=>{
+          const lbl=document.createElement("label");lbl.className="radio-opt"+(val===o?" selected":"");
+          const inp=document.createElement("input");inp.type="radio";inp.name=`${pid}_${fc}_${key}`;inp.value=o;inp.checked=val===o;
+          inp.addEventListener("change",()=>{sv(key,o);wrap.querySelectorAll(".radio-opt").forEach(l=>l.classList.toggle("selected",l.querySelector("input").value===o))});
+          lbl.appendChild(inp);const sp=document.createElement("span");sp.textContent=o;lbl.appendChild(sp);wrap.appendChild(lbl);
+        });
+        body.appendChild(wrap);
+      } else if(type==="select"&&opts.length>0){
+        const sel=document.createElement("select");
+        opts.forEach(o=>{const op=document.createElement("option");op.value=o;op.textContent=o||"— Sélectionner —";if(o===val)op.selected=true;sel.appendChild(op)});
+        sel.addEventListener("change",e=>sv(key,e.target.value));body.appendChild(sel);
+      } else if(type==="textarea"){
+        const ta=document.createElement("textarea");ta.value=val;if(hint)ta.placeholder=hint;
+        ta.addEventListener("input",e=>sv(key,e.target.value));body.appendChild(ta);
+      } else {
+        const inp=document.createElement("input");inp.type=type==="number"?"number":type==="date"?"date":"text";
+        inp.value=val;if(hint)inp.placeholder=hint;
+        inp.addEventListener("input",e=>sv(key,e.target.value));body.appendChild(inp);
+      }
+      card.appendChild(body);
+    }
+    area.appendChild(card);
+  });
+
+  // Add field button (admin)
+  const afb=document.createElement("button");afb.className="admin-add-btn";afb.textContent="+ Ajouter un champ dans cette section";
+  afb.onclick=()=>{pendingSec=aS;openDrawer("add-field-drawer")};area.appendChild(afb);
+
+  // Last section extras
+  if(aS===form.sections.length-1){
+    if(form.pieces?.length){
+      const pb=document.createElement("div");pb.className="pieces-box";
+      pb.innerHTML=`<div class="pieces-t">Pièces à joindre si disponibles</div>`;
+      form.pieces.forEach(p=>{
+        const k="piece_"+mk(p),checked=allData[pid]?.[fc]?.[k]==="true";
+        const item=document.createElement("div");item.className="piece-item";
+        const inp=document.createElement("input");inp.type="checkbox";inp.checked=checked;
+        inp.addEventListener("change",e=>sv(k,e.target.checked.toString()));
+        item.appendChild(inp);item.appendChild(document.createTextNode(p));pb.appendChild(item);
+      });
+      area.appendChild(pb);
+    }
+    const obs=document.createElement("div");obs.className="obs-box";
+    obs.innerHTML=`<div class="obs-t">Observations / Points ouverts</div>`;
+    const ta=document.createElement("textarea");ta.value=allData[pid]?.[fc]?.["__obs"]||"";ta.placeholder="Notes libres, points à suivre...";
+    ta.addEventListener("input",e=>sv("__obs",e.target.value));obs.appendChild(ta);area.appendChild(obs);
+
+    const sigGrid=document.createElement("div");sigGrid.className="sig-grid";
+    ["Rempli par","Rôle","Date","Validé par"].forEach(lbl=>{
+      const k="sig_"+mk(lbl),cell=document.createElement("div");cell.className="sig-cell";
+      cell.innerHTML=`<div class="sig-lbl">${lbl}</div>`;
+      const inp=document.createElement("input");inp.type=lbl==="Date"?"date":"text";inp.value=allData[pid]?.[fc]?.[k]||"";inp.style.cssText="width:100%;border:none;border-bottom:1px solid var(--border-dk);padding:6px 0;font-size:14px;background:transparent;font-family:'DM Sans',sans-serif";
+      inp.addEventListener("input",e=>sv(k,e.target.value));cell.appendChild(inp);sigGrid.appendChild(cell);
+    });
+    area.appendChild(sigGrid);
+
+    const asb=document.createElement("button");asb.className="admin-add-btn";asb.style.marginTop="16px";asb.textContent="+ Ajouter une section à cette fiche";
+    asb.onclick=()=>openDrawer("add-section-drawer");area.appendChild(asb);
+  }
+}
+
+// ── ADMIN OPS ─────────────────────────────────────────────────────────────────
+function togOV(eid){const t=document.getElementById(eid+"_t").value;const w=document.getElementById(eid+"_ow");if(w)w.style.display=(t==="select"||t==="radio")?"block":"none"}
+async function saveF(eid,si,fi){
+  const label=document.getElementById(eid+"_l").value.trim();if(!label){alert("Libellé requis.");return}
+  const type=document.getElementById(eid+"_t").value,status=document.getElementById(eid+"_s").value;
+  const role=document.getElementById(eid+"_r").value,adv=document.getElementById(eid+"_a").value==="true";
+  const hint=document.getElementById(eid+"_h").value,note=document.getElementById(eid+"_n").value;
+  let opts=[];const ow=document.getElementById(eid+"_o");
+  if(ow&&(type==="select"||type==="radio"))opts=ow.value.split("\n").map(o=>o.trim());
+  config[aF].sections[si].fields[fi]=[status,role,label,type,hint,note,opts,adv];
+  saveAll();renderFields();
+}
+async function delF(si,fi){if(!confirm("Supprimer ce champ ?"))return;config[aF].sections[si].fields.splice(fi,1);saveAll();renderFields()}
+async function movF(si,fi,d){const fs=config[aF].sections[si].fields,ni=fi+d;if(ni<0||ni>=fs.length)return;[fs[fi],fs[ni]]=[fs[ni],fs[fi]];saveAll();renderFields()}
+async function updFM(k,v){if(k==="outputs")config[aF].outputs=v.split("|").map(s=>s.trim());else config[aF][k]=v;saveAll()}
+async function updSL(si,v){config[aF].sections[si].label=v;saveAll();renderHeader()}
+async function updSR(si,v){config[aF].sections[si].role=v;saveAll();renderFields()}
+async function delSec(si){
+  if(config[aF].sections.length===1){alert("Une fiche doit avoir au moins une section.");return}
+  if(!confirm("Supprimer cette section ?"))return;
+  config[aF].sections.splice(si,1);if(aS>=config[aF].sections.length)aS=config[aF].sections.length-1;
+  if(dbReady)saveConfig();renderHeader();renderFields();
+}
+async function saveNewField(){
+  const label=document.getElementById("nfl").value.trim();if(!label){alert("Libellé requis.");return}
+  const type=document.getElementById("nft").value,status=document.getElementById("nfs").value;
+  const role=document.getElementById("nfr").value,hint=document.getElementById("nfh").value;
+  let opts=[];const ow=document.getElementById("nfo");
+  if(ow&&(type==="select"||type==="radio"))opts=ow.value.split("\n").map(o=>o.trim()).filter(Boolean);
+  const si=pendingSec??aS;
+  config[aF].sections[si].fields.push([status,role,label,type,hint,"",opts,false]);
+  saveAll();closeDrawer("add-field-drawer");
+  ["nfl","nfh","nfo"].forEach(id=>{const el=document.getElementById(id);if(el)el.value=""});
+  renderFields();
+}
+async function saveNewSection(){
+  const label=document.getElementById("nsl").value.trim();if(!label){alert("Nom requis.");return}
+  const role=document.getElementById("nsr").value;
+  config[aF].sections.push({label,role,fields:[]});
+  saveAll();closeDrawer("add-section-drawer");document.getElementById("nsl").value="";
+  aS=config[aF].sections.length-1;renderHeader();renderFields();
+}
+
+// ── DRAWERS ───────────────────────────────────────────────────────────────────
+function openDrawer(id){document.getElementById(id).classList.add("open")}
+function closeDrawer(id){document.getElementById(id).classList.remove("open")}
+
+// ── EXPORT ────────────────────────────────────────────────────────────────────
+function exportPDF(){
+  closeDrawer("export-drawer");
+  const form=config[aF],fc=form.code;
+  const area=document.getElementById("fields-area"),orig=area.innerHTML;
+  let html=`<h2 style="font-family:Georgia,serif;font-size:18px;color:#1C1A14;margin-bottom:5px">${form.code} — ${form.title}</h2>`;
+  form.sections.forEach(s=>{
+    html+=`<h3 style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#8B6A18;border-bottom:1px solid #DDD6C8;padding-bottom:4px;margin:14px 0 8px">${s.label}</h3>`;
+    s.fields.forEach(f=>{
+      const[status,,label,,hint]=f,key=mk(label),val=allData[pid]?.[fc]?.[key]||"";
+      html+=`<div style="margin-bottom:8px;border:1px solid #DDD6C8;border-radius:6px;overflow:hidden"><div style="background:${status===O?"#FBF8EE":"#F0EDE6"};padding:5px 10px;font-size:10px;font-weight:${status===O?"700":"400"};color:${status===O?"#8B6A18":"#56524A"}">${label} ${status===O?"★":""}</div><div style="padding:7px 10px;font-size:12px;min-height:24px;color:${val?"#1C1A14":"#C4BFB6"}">${val||hint||"—"}</div></div>`;
+    });
+  });
+  area.innerHTML=html;window.print();area.innerHTML=orig;renderFields();
+}
+function exportData(){
+  closeDrawer("export-drawer");
+  const p=projects.find(p=>p.id===pid);
+  dl(new Blob([JSON.stringify({project:p,data:allData[pid]||{},exportedAt:new Date().toISOString()},null,2)],{type:"application/json"}),`PKRO_${p?.ref||"projet"}_${today()}.json`);
+}
+function exportAllData(){
+  closeDrawer("export-drawer");
+  dl(new Blob([JSON.stringify({projects,data:allData,config,exportedAt:new Date().toISOString()},null,2)],{type:"application/json"}),`PKRO_tous_projets_${today()}.json`);
+}
+function exportConfig(){
+  closeDrawer("export-drawer");
+  dl(new Blob([JSON.stringify(config,null,2)],{type:"application/json"}),`PKRO_Config_${today()}.json`);
+}
+function exportCSV(){
+  closeDrawer("export-drawer");
+  const form=config[aF],fc=form.code;
+  const rows=[["Formulaire","Section","Champ","Statut","Rôle","Type","Valeur"]];
+  form.sections.forEach(s=>s.fields.forEach(f=>{
+    const[status,role,label,type]=f,val=allData[pid]?.[fc]?.[mk(label)]||"";
+    rows.push([form.title,s.label,label,status,role,type,val]);
+  }));
+  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
+  dl(new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"}),`PKRO_${fc}_${today()}.csv`);
+}
+function copyText(){
+  closeDrawer("export-drawer");
+  const form=config[aF],fc=form.code;
+  let text=`${form.code} — ${form.title}\n${"=".repeat(50)}\n\n`;
+  form.sections.forEach(s=>{
+    text+=`${s.label.toUpperCase()}\n${"-".repeat(30)}\n`;
+    s.fields.forEach(f=>{const[,,label]=f,val=allData[pid]?.[fc]?.[mk(label)];if(val)text+=`${label}: ${val}\n`});
+    text+="\n";
+  });
+  navigator.clipboard.writeText(text).then(()=>{const pill=document.getElementById("save-pill");pill.textContent="✓ Copié";pill.classList.add("show");setTimeout(()=>{pill.classList.remove("show");pill.textContent="✓ Sauvegardé"},1600)}).catch(()=>alert("Copié."));
+}
+function importConfig(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const parsed=JSON.parse(ev.target.result);
+      if(!Array.isArray(parsed)||!parsed[0]?.code)throw new Error("Format invalide");
+      if(!confirm(`Importer cette configuration (${parsed.length} fiches) ?`))return;
+      config=parsed;if(dbReady)saveConfig();if(pid){aF=0;aS=0;renderFormNav();renderHeader();renderFields()}
+      alert("Configuration importée.");
+    }catch(err){alert("Erreur : "+err.message)}
+  };
+  reader.readAsText(file);e.target.value="";
+}
+function dl(blob,name){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;a.click()}
+function today(){return new Date().toISOString().slice(0,10)}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+load().then(()=>{renderProjects();});
+// Close drawers on back button (mobile)
+window.addEventListener("popstate",()=>{
+  document.querySelectorAll(".overlay.open").forEach(el=>el.classList.remove("open"));
+});
+</script>
+</body>
+</html>
