@@ -358,27 +358,23 @@ textarea::placeholder{color:var(--faint)}
     <div class="drawer-title">Exporter & Générer</div>
 
     <!-- SECTION: EXPORT -->
-    <div style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:0 0 10px">Export de données</div>
+    <div style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:0 0 10px">Export — Fiche active (champs remplis uniquement)</div>
     <div class="drawer-opts">
-      <button class="drawer-opt" onclick="exportFichePDF()">
-        <strong>📄 PDF — Fiche complète</strong>
-        <span>Toutes les sections de la fiche active en un seul PDF</span>
+      <button class="drawer-opt" onclick="exportFicheWord()">
+        <strong>📝 Word (.docx) — Fiche complète</strong>
+        <span>Toutes les sections · Format document éditable · Téléchargement direct</span>
       </button>
-      <button class="drawer-opt" onclick="exportFicheCSV()">
-        <strong>📊 CSV — Fiche complète</strong>
-        <span>Toutes les sections de la fiche active pour Excel</span>
+      <button class="drawer-opt" onclick="exportFichePDFClean()">
+        <strong>📄 PDF — Fiche complète</strong>
+        <span>Toutes les sections · Format propre · Via impression navigateur</span>
       </button>
       <button class="drawer-opt" onclick="exportFicheText()">
-        <strong>📋 Texte — Fiche complète</strong>
-        <span>Toutes les sections copiées pour WhatsApp ou email</span>
+        <strong>📋 Copier en texte</strong>
+        <span>Pour WhatsApp ou email · Champs remplis uniquement</span>
       </button>
       <button class="drawer-opt" onclick="exportData()">
         <strong>📦 JSON — Projet complet</strong>
-        <span>Toutes les fiches du projet actif</span>
-      </button>
-      <button class="drawer-opt" onclick="exportAllData()">
-        <strong>📦 JSON — Tous les projets</strong>
-        <span>Backup complet de tous les projets</span>
+        <span>Toutes les fiches du projet · Backup ou partage équipe</span>
       </button>
     </div>
 
@@ -1124,55 +1120,122 @@ function collectProjectSnapshot(formCodes){
   return snap;
 }
 
-// PDF — fiche complète (toutes sections)
-function exportFichePDF(){
+// ── WORD EXPORT (.docx via HTML conversion) ──────────────────────────────────
+function exportFicheWord(){
+  closeDrawer("export-drawer");
+  const form=config[aF],fc=form.code;
+  const proj=projects.find(p=>p.id===pid)||{};
+
+  // Build full HTML document styled for Word
+  let body="";
+  form.sections.forEach(s=>{
+    let secRows="";
+    s.fields.forEach(f=>{
+      const[status,role,label,,,,]=f;
+      const val=allData[pid]?.[fc]?.[mk(label)]||"";
+      if(!val)return; // only filled fields
+      secRows+=`<tr>
+        <td style="background:${status==="Obligatoire"?"#FBF8EE":"#F8F5EF"};padding:6pt 8pt;border:1pt solid #DDD6C8;font-size:9pt;font-weight:${status==="Obligatoire"?"bold":"normal"};color:${status==="Obligatoire"?"#8B6A18":"#5C5C54"};width:35%;vertical-align:top">${label}${status==="Obligatoire"?" ★":""}</td>
+        <td style="padding:6pt 8pt;border:1pt solid #DDD6C8;font-size:10pt;color:#1C1A14;white-space:pre-wrap;vertical-align:top">${val}</td>
+      </tr>`;
+    });
+    if(!secRows)return;
+    body+=`
+      <h3 style="font-size:9pt;font-weight:bold;text-transform:uppercase;letter-spacing:1pt;color:#8B6A18;border-bottom:2pt solid #F5EDD4;padding-bottom:4pt;margin:14pt 0 6pt">${s.label}</h3>
+      <table style="width:100%;border-collapse:collapse;margin-bottom:12pt">${secRows}</table>`;
+  });
+
+  const obs=allData[pid]?.[fc]?.["__obs"];
+  if(obs) body+=`<h3 style="font-size:9pt;font-weight:bold;text-transform:uppercase;letter-spacing:1pt;color:#8B6A18;border-bottom:2pt solid #F5EDD4;padding-bottom:4pt;margin:14pt 0 6pt">Observations</h3><p style="font-size:10pt;color:#1C1A14;white-space:pre-wrap">${obs}</p>`;
+
+  const html=`
+    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+    <head><meta charset="UTF-8">
+    <style>
+      @page { margin: 2cm; }
+      body { font-family: Arial, sans-serif; font-size: 10pt; color: #1C1A14; }
+      table { border-collapse: collapse; width: 100%; }
+    </style>
+    </head>
+    <body>
+      <table style="width:100%;border-bottom:3pt solid #C9A84C;margin-bottom:16pt;border-collapse:collapse">
+        <tr>
+          <td style="border:none;padding:0 0 8pt 0">
+            <div style="font-size:8pt;font-weight:bold;letter-spacing:2pt;text-transform:uppercase;color:#C9A84C;margin-bottom:4pt">${form.code} — Property Kro CI</div>
+            <div style="font-size:18pt;font-weight:bold;color:#1C1A14;font-family:Georgia,serif">${form.title}</div>
+          </td>
+          <td style="border:none;padding:0 0 8pt 0;text-align:right;vertical-align:bottom">
+            <div style="font-size:11pt;font-weight:bold;color:#1C1A14">${proj.name||""}</div>
+            <div style="font-size:9pt;color:#9A9690">${proj.ref||""} · ${today()}</div>
+          </td>
+        </tr>
+      </table>
+      ${body}
+      <p style="margin-top:20pt;font-size:8pt;color:#9A9690;border-top:1pt solid #DDD6C8;padding-top:6pt">
+        Property Kro CI — Document confidentiel — Généré le ${today()}
+      </p>
+    </body></html>`;
+
+  const blob=new Blob(["﻿"+html],{type:"application/msword;charset=utf-8"});
+  dl(blob,`PKRO_${fc}_${proj.ref||"projet"}_${today()}.doc`);
+}
+
+// ── PDF — fiche complète propre via impression ────────────────────────────────
+function exportFichePDFClean(){
   closeDrawer("export-drawer");
   const form=config[aF],fc=form.code;
   const proj=projects.find(p=>p.id===pid)||{};
   const area=document.getElementById("fields-area"),orig=area.innerHTML;
-  let html=`<div style="font-family:Arial,sans-serif;max-width:780px;margin:0 auto;padding:20px">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:12px;border-bottom:3px solid #C9A84C">
+
+  let html=`<div style="font-family:Arial,sans-serif;max-width:760px;margin:0 auto;padding:0">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:18px;padding-bottom:10px;border-bottom:3px solid #C9A84C">
       <div>
-        <div style="font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#C9A84C;margin-bottom:4px">${form.code}</div>
-        <div style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#1C1A14">${form.title}</div>
+        <div style="font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#C9A84C;margin-bottom:4px">${form.code} — PROPERTY KRO CI</div>
+        <div style="font-family:Georgia,serif;font-size:20px;font-weight:700;color:#1C1A14">${form.title}</div>
       </div>
       <div style="text-align:right">
         <div style="font-size:12px;font-weight:700;color:#1C1A14">${proj.name||""}</div>
-        <div style="font-size:11px;color:#9A9690">${proj.ref||""} · ${today()}</div>
+        <div style="font-size:10px;color:#9A9690">${proj.ref||""} · ${today()}</div>
       </div>
     </div>`;
+
   form.sections.forEach(s=>{
-    html+=`<div style="margin-bottom:18px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#8B6A18;border-bottom:2px solid #F5EDD4;padding-bottom:5px;margin-bottom:9px">${s.label}</div>`;
+    let rows="";
     s.fields.forEach(f=>{
-      const[status,,label,,hint,note]=f,val=allData[pid]?.[fc]?.[mk(label)]||"";
-      if(!val&&status!=="Obligatoire")return;
-      html+=`<div style="margin-bottom:7px;border:1px solid #DDD6C8;border-radius:3px;overflow:hidden">
-        <div style="background:${status==="Obligatoire"?"#FBF8EE":"#F8F5EF"};padding:4px 9px;font-size:10px;font-weight:${status==="Obligatoire"?"700":"400"};color:${status==="Obligatoire"?"#8B6A18":"#5C5C54"}">
-          ${label}${status==="Obligatoire"?" ★":""}${note?` — ⚠ ${note}`:""}
-        </div>
-        <div style="padding:6px 9px;font-size:12px;color:${val?"#1C1A14":"#C4BFB6"};min-height:20px;white-space:pre-wrap">${val||"—"}</div>
+      const[status,,label]=f;
+      const val=allData[pid]?.[fc]?.[mk(label)]||"";
+      if(!val)return;
+      rows+=`<div style="display:flex;border:1px solid #DDD6C8;border-top:none;overflow:hidden">
+        <div style="width:35%;padding:5px 8px;background:${status==="Obligatoire"?"#FBF8EE":"#F8F5EF"};font-size:10px;font-weight:${status==="Obligatoire"?"700":"400"};color:${status==="Obligatoire"?"#8B6A18":"#5C5C54"};flex-shrink:0;border-right:1px solid #DDD6C8">${label}${status==="Obligatoire"?" ★":""}</div>
+        <div style="padding:5px 8px;font-size:11px;color:#1C1A14;white-space:pre-wrap;flex:1">${val}</div>
       </div>`;
     });
-    html+=`</div>`;
+    if(!rows)return;
+    html+=`<div style="margin-bottom:16px">
+      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#8B6A18;background:#F5EDD4;padding:5px 8px;border:1px solid #DDD6C8">${s.label}</div>
+      ${rows}
+    </div>`;
   });
-  const obs=allData[pid]?.[fc]?.["__obs"];
-  if(obs)html+=`<div style="margin-top:14px;padding:10px;background:#F0EDE6;border-radius:3px"><div style="font-size:9px;font-weight:700;color:#9A9690;text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px">Observations</div><div style="font-size:12px;color:#1C1A14;white-space:pre-wrap">${obs}</div></div>`;
-  html+=`</div>`;
-  area.innerHTML=html;window.print();area.innerHTML=orig;renderFields();
-}
 
-// CSV — fiche complète
-function exportFicheCSV(){
-  closeDrawer("export-drawer");
-  const form=config[aF],fc=form.code;
-  const proj=projects.find(p=>p.id===pid)||{};
-  const rows=[["Projet","Référence","Formulaire","Section","Champ","Statut","Rôle","Type","Valeur"]];
-  form.sections.forEach(s=>s.fields.forEach(f=>{
-    const[status,role,label,type]=f,val=allData[pid]?.[fc]?.[mk(label)]||"";
-    rows.push([proj.name||"",proj.ref||"",form.title,s.label,label,status,role,type,val]);
-  }));
-  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
-  dl(new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"}),`PKRO_${fc}_complet_${today()}.csv`);
+  const obs=allData[pid]?.[fc]?.["__obs"];
+  if(obs) html+=`<div style="margin-top:14px;padding:10px;background:#F0EDE6;border:1px solid #DDD6C8">
+    <div style="font-size:9px;font-weight:700;color:#9A9690;text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px">Observations</div>
+    <div style="font-size:11px;color:#1C1A14;white-space:pre-wrap">${obs}</div>
+  </div>`;
+
+  html+=`<div style="margin-top:18px;font-size:8px;color:#9A9690;border-top:1px solid #DDD6C8;padding-top:5px">Property Kro CI — Document confidentiel — Généré le ${today()}</div></div>`;
+
+  // Inject print styles and trigger
+  const style=document.createElement("style");
+  style.id="print-override";
+  style.textContent=`@media print{body>*:not(#print-frame){display:none!important}#print-frame{display:block!important}}`;
+  document.head.appendChild(style);
+  const frame=document.createElement("div");
+  frame.id="print-frame";frame.innerHTML=html;
+  document.body.appendChild(frame);
+  window.print();
+  document.head.removeChild(style);
+  document.body.removeChild(frame);
 }
 
 // Texte — fiche complète
