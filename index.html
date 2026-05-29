@@ -645,7 +645,11 @@ function saveAll(){ /* kept for compat — real saves go through sv() */ }
 
 function gv(k){return allData[pid]?.[config[aF]?.code]?.[k]??""}
 
-function isUUID(id){return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);}
+function isUUID(id){
+  if(!id||typeof id!=="string"||id.length!==36)return false;
+  const p=id.split("-");
+  return p.length===5&&p[0].length===8&&p[1].length===4&&p[2].length===4&&p[3].length===4&&p[4].length===12;
+}
 
 function sv(k,v){
   const fc=config[aF].code;
@@ -1152,74 +1156,64 @@ function collectProjectSnapshot(formCodes){
   return snap;
 }
 
-// ── WORD EXPORT via RTF (compatible Word, Pages, Google Docs) ────────────────
+// ── WORD EXPORT via RTF ──────────────────────────────────────────────────────
 function exportFicheWord(){
   closeDrawer("export-drawer");
   const form=config[aF],fc=form.code;
   const proj=projects.find(p=>p.id===pid)||{};
 
-  // RTF format — opens natively in Word, Pages, LibreOffice on all devices
-  const esc=s=>String(s||"").replace(/\\/g,"\\\\").replace(/[{}]/g,"\\$&")
-    .replace(/[^ -]/g,c=>{const code=c.charCodeAt(0);return code<256?"\\'"+code.toString(16).padStart(2,"0"):"\\u"+code+"?"});
-
-  let rtf="{\\rtf1\\ansi\\deff0
-";
-  rtf+="{\\fonttbl{\\f0\\fswiss Arial;}{\\f1\\froman Georgia;}}
-";
-  rtf+="{\\colortbl;\\red28\\green26\\blue20;\\red139\\green106\\blue24;\\red92\\green92\\blue84;\\red200\\green200\\blue200;}
-";
-  rtf+="\\margl1440\\margr1440\\margt1440\\margb1440
-";
-
-  // Header
-  rtf+=`{\\f1\\fs32\\b\\cf2 ${esc(form.code)} - ${esc(form.title)}}\\par
-`;
-  rtf+=`{\\f0\\fs18\\cf3 ${esc(proj.name||"")} - ${esc(proj.ref||"")} - ${today()}}\\par
-`;
-  rtf+="\\par\\brdrb\\brdrs\\brdrw10\\brdrsp20\\par
-";
-
-  form.sections.forEach(s=>{
-    let hasContent=s.fields.some(f=>allData[pid]?.[fc]?.[mk(f[2])]);
-    if(!hasContent)return;
-
-    // Section header
-    rtf+=`\\par{\\f0\\fs20\\b\\cf2\\caps ${esc(s.label)}}\\par
-`;
-    rtf+="\\brdrb\\brdrs\\brdrw5\\par
-";
-
-    s.fields.forEach(f=>{
-      const[status,,label]=f;
-      const val=allData[pid]?.[fc]?.[mk(label)]||"";
-      if(!val)return;
-      // Label + value
-      rtf+=`{\\f0\\fs17\\b\\cf2 ${esc(label)}${status==="Obligatoire"?" \\u9733?":""}}\\par
-`;
-      rtf+=`{\\f0\\fs19\\cf1 ${esc(val)}}\\par\\par
-`;
-    });
-  });
-
-  // Observations
-  const obs=allData[pid]?.[fc]?.["__obs"];
-  if(obs){
-    rtf+="\\par{\\f0\\fs20\\b\\cf2\\caps Observations}\\par
-";
-    rtf+=`{\\f0\\fs19\\cf1 ${esc(obs)}}\\par
-`;
+  // Build plain RTF — no complex escaping, maximum compatibility
+  function rtfStr(s){
+    if(!s)return "";
+    let out="";
+    for(let i=0;i<s.length;i++){
+      const c=s.charCodeAt(i);
+      if(c===92)out+="\\\\";
+      else if(c===123)out+="\\{";
+      else if(c===125)out+="\\}";
+      else if(c<128)out+=s[i];
+      else out+="\\u"+c+"?";
+    }
+    return out;
   }
 
-  // Footer
-  rtf+="\\par\\brdrb\\brdrs\\brdrw5\\par
-";
-  rtf+=`{\\f0\\fs15\\cf3 Property Kro CI - Document confidentiel - ${today()}}\\par
-`;
+  let rtf="{\\rtf1\\ansi\\ansicpg1252\\deff0\n";
+  rtf+="{\\fonttbl{\\f0\\fswiss\\fcharset0 Arial;}{\\f1\\froman\\fcharset0 Georgia;}}\n";
+  rtf+="{\\colortbl ;\\red28\\green26\\blue20;\\red139\\green106\\blue24;\\red92\\green92\\blue84;}\n";
+  rtf+="\\widowctrl\\hyphauto\\margl1440\\margr1440\\margt1440\\margb1440\n";
+
+  // Header
+  rtf+="{\\f1\\fs30\\b\\cf2 "+rtfStr(form.code)+" - "+rtfStr(form.title)+"}\\par\n";
+  rtf+="{\\f0\\fs18\\cf3 "+rtfStr(proj.name||"")+" - "+rtfStr(proj.ref||"")+" - "+today()+"}\\par\n";
+  rtf+="\\par\n";
+
+  form.sections.forEach(function(s){
+    var hasContent=s.fields.some(function(f){return !!(allData[pid]&&allData[pid][fc]&&allData[pid][fc][mk(f[2])]);});
+    if(!hasContent)return;
+    rtf+="{\\f0\\fs20\\b\\cf2\\caps "+rtfStr(s.label)+"}\\par\n";
+    s.fields.forEach(function(f){
+      var status=f[0],label=f[2];
+      var val=(allData[pid]&&allData[pid][fc]&&allData[pid][fc][mk(label)])||"";
+      if(!val)return;
+      rtf+="{\\f0\\fs18\\b "+rtfStr(label)+(status==="Obligatoire"?" *":"")+": }";
+      rtf+="{\\f0\\fs18 "+rtfStr(val)+"}\\par\n";
+    });
+    rtf+="\\par\n";
+  });
+
+  var obs=(allData[pid]&&allData[pid][fc]&&allData[pid][fc]["__obs"])||"";
+  if(obs){
+    rtf+="{\\f0\\fs20\\b\\cf2\\caps Observations}\\par\n";
+    rtf+="{\\f0\\fs18 "+rtfStr(obs)+"}\\par\n\\par\n";
+  }
+
+  rtf+="{\\f0\\fs16\\cf3 Property Kro CI - Confidentiel - "+today()+"}\\par\n";
   rtf+="}";
 
-  const blob=new Blob([rtf],{type:"application/rtf"});
-  dl(blob,`PKRO_${fc}_${proj.ref||"projet"}_${today()}.rtf`);
+  var blob=new Blob([rtf],{type:"application/rtf"});
+  dl(blob,"PKRO_"+fc+"_"+(proj.ref||"projet")+"_"+today()+".rtf");
 }
+
 // ── PDF — fiche complète via nouvelle fenêtre ───────────────────────────────
 function exportFichePDFClean(){
   closeDrawer("export-drawer");
