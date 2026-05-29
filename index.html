@@ -353,20 +353,88 @@ textarea::placeholder{color:var(--faint)}
 
 <!-- ══ EXPORT DRAWER ══════════════════════════════════════════════════════════ -->
 <div class="overlay" id="export-drawer" onclick="closeDrawer('export-drawer')">
-  <div class="drawer" onclick="event.stopPropagation()">
+  <div class="drawer" onclick="event.stopPropagation()" style="max-height:90vh;overflow-y:auto">
     <div class="drawer-handle"></div>
-    <div class="drawer-title">Exporter</div>
+    <div class="drawer-title">Exporter & Générer</div>
+
+    <!-- SECTION: EXPORT -->
+    <div style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:0 0 10px">Export de données</div>
     <div class="drawer-opts">
-      <button class="drawer-opt" onclick="exportPDF()"><strong>📄 PDF — via impression</strong><span>Enregistrer en PDF depuis l'impression</span></button>
-      <button class="drawer-opt" onclick="exportData()"><strong>📦 JSON — Projet actif</strong><span>Toutes les réponses de ce projet</span></button>
-      <button class="drawer-opt" onclick="exportAllData()"><strong>📦 JSON — Tous les projets</strong><span>Backup complet</span></button>
-      <button class="drawer-opt" onclick="exportConfig()"><strong>⚙ JSON — Configuration</strong><span>Structure des fiches à partager avec l'équipe</span></button>
-      <button class="drawer-opt" onclick="exportCSV()"><strong>📊 CSV — Fiche active</strong><span>Pour Excel ou Google Sheets</span></button>
-      <button class="drawer-opt" onclick="copyText()"><strong>📋 Copier en texte</strong><span>Pour WhatsApp ou email</span></button>
+      <button class="drawer-opt" onclick="exportFichePDF()">
+        <strong>📄 PDF — Fiche complète</strong>
+        <span>Toutes les sections de la fiche active en un seul PDF</span>
+      </button>
+      <button class="drawer-opt" onclick="exportFicheCSV()">
+        <strong>📊 CSV — Fiche complète</strong>
+        <span>Toutes les sections de la fiche active pour Excel</span>
+      </button>
+      <button class="drawer-opt" onclick="exportFicheText()">
+        <strong>📋 Texte — Fiche complète</strong>
+        <span>Toutes les sections copiées pour WhatsApp ou email</span>
+      </button>
+      <button class="drawer-opt" onclick="exportData()">
+        <strong>📦 JSON — Projet complet</strong>
+        <span>Toutes les fiches du projet actif</span>
+      </button>
+      <button class="drawer-opt" onclick="exportAllData()">
+        <strong>📦 JSON — Tous les projets</strong>
+        <span>Backup complet de tous les projets</span>
+      </button>
     </div>
+
+    <!-- SECTION: GENERATE -->
+    <div style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:18px 0 10px">Générer un document</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.5">
+      Les documents sont générés automatiquement à partir des données saisies dans le projet.
+    </div>
+    <div class="drawer-opts">
+      <button class="drawer-opt" onclick="generateDoc('teaser')">
+        <strong>🏢 Investment Teaser</strong>
+        <span>Résumé exécutif du projet pour investisseurs ou banques · Depuis F01 F03 F04 F07 F08</span>
+      </button>
+      <button class="drawer-opt" onclick="generateDoc('termsheet')">
+        <strong>📋 Term Sheet</strong>
+        <span>Structure de financement et conditions · Depuis F09</span>
+      </button>
+      <button class="drawer-opt" onclick="generateDoc('memo')">
+        <strong>📝 Investment Memo</strong>
+        <span>Mémo interne d'investissement complet · Depuis F01 à F11</span>
+      </button>
+      <button class="drawer-opt" onclick="generateDoc('pipeline')">
+        <strong>📌 Fiche Pipeline 1 page</strong>
+        <span>Résumé rapide pour revue de pipeline · Depuis F01 F07 F08 F11</span>
+      </button>
+      <button class="drawer-opt" onclick="generateDoc('readiness')">
+        <strong>✅ Readiness Sheet</strong>
+        <span>État d'avancement et gaps critiques · Depuis F05 F11 F12</span>
+      </button>
+    </div>
+
     <button class="drawer-close" onclick="closeDrawer('export-drawer')">Fermer</button>
   </div>
 </div>
+
+<!-- ══ DOCUMENT OUTPUT DRAWER ════════════════════════════════════════════════ -->
+<div class="overlay" id="doc-drawer" onclick="closeDrawer('doc-drawer')">
+  <div class="drawer" onclick="event.stopPropagation()" style="max-height:92vh;display:flex;flex-direction:column">
+    <div class="drawer-handle"></div>
+    <div class="drawer-title" id="doc-drawer-title">Document généré</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px" id="doc-drawer-meta"></div>
+    <div id="doc-loading" style="display:none;text-align:center;padding:40px 0">
+      <div style="font-size:28px;margin-bottom:12px;animation:spin 1s linear infinite">⚙</div>
+      <div style="font-size:13px;color:var(--muted)">Génération en cours...</div>
+      <div style="font-size:11px;color:var(--ink-faint);margin-top:6px" id="doc-loading-sub">Analyse des données du projet</div>
+    </div>
+    <div id="doc-content" style="flex:1;overflow-y:auto;background:var(--bg);border-radius:8px;padding:16px;font-size:13px;line-height:1.7;color:var(--ink);white-space:pre-wrap;font-family:'DM Sans',sans-serif;display:none"></div>
+    <div style="display:flex;gap:10px;margin-top:14px;flex-shrink:0" id="doc-actions" style="display:none">
+      <button class="aep-btn aep-save" style="flex:1" onclick="copyDocContent()">📋 Copier</button>
+      <button class="aep-btn aep-cancel" style="flex:1" onclick="closeDrawer('doc-drawer')">Fermer</button>
+    </div>
+  </div>
+</div>
+<style>
+@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+</style>
 
 <!-- ══ ADD FIELD DRAWER ═══════════════════════════════════════════════════════ -->
 <div class="overlay" id="add-field-drawer" onclick="closeDrawer('add-field-drawer')">
@@ -1010,20 +1078,106 @@ function openDrawer(id){document.getElementById(id).classList.add("open")}
 function closeDrawer(id){document.getElementById(id).classList.remove("open")}
 
 // ── EXPORT ────────────────────────────────────────────────────────────────────
-function exportPDF(){
+
+// Collect all sections of one form
+function collectFullForm(fc){
+  const form=config.find(f=>f.code===fc);if(!form)return null;
+  const out={code:form.code,title:form.title,sections:[]};
+  form.sections.forEach(s=>{
+    const sec={label:s.label,fields:[]};
+    s.fields.forEach(f=>{
+      const[status,role,label,type,,note]=f;
+      const val=allData[pid]?.[fc]?.[mk(label)]||"";
+      sec.fields.push({label,status,role,type,value:val,note:note||""});
+    });
+    out.sections.push(sec);
+  });
+  return out;
+}
+
+// Collect data snapshot from multiple forms
+function collectProjectSnapshot(formCodes){
+  const proj=projects.find(p=>p.id===pid)||{};
+  const snap={project:{name:proj.name,ref:proj.ref,type:proj.type},forms:{}};
+  (formCodes||config.map(f=>f.code)).forEach(fc=>{
+    const form=config.find(f=>f.code===fc);if(!form)return;
+    const data={};
+    form.sections.forEach(s=>s.fields.forEach(f=>{
+      const val=allData[pid]?.[fc]?.[mk(f[2])]||"";
+      if(val)data[f[2]]=val;
+    }));
+    if(Object.keys(data).length)snap.forms[fc]=data;
+  });
+  return snap;
+}
+
+// PDF — fiche complète (toutes sections)
+function exportFichePDF(){
   closeDrawer("export-drawer");
   const form=config[aF],fc=form.code;
+  const proj=projects.find(p=>p.id===pid)||{};
   const area=document.getElementById("fields-area"),orig=area.innerHTML;
-  let html=`<h2 style="font-family:Georgia,serif;font-size:18px;color:#1C1A14;margin-bottom:5px">${form.code} — ${form.title}</h2>`;
+  let html=`<div style="font-family:Arial,sans-serif;max-width:780px;margin:0 auto;padding:20px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:12px;border-bottom:3px solid #C9A84C">
+      <div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#C9A84C;margin-bottom:4px">${form.code}</div>
+        <div style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#1C1A14">${form.title}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:12px;font-weight:700;color:#1C1A14">${proj.name||""}</div>
+        <div style="font-size:11px;color:#9A9690">${proj.ref||""} · ${today()}</div>
+      </div>
+    </div>`;
   form.sections.forEach(s=>{
-    html+=`<h3 style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#8B6A18;border-bottom:1px solid #DDD6C8;padding-bottom:4px;margin:14px 0 8px">${s.label}</h3>`;
+    html+=`<div style="margin-bottom:18px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#8B6A18;border-bottom:2px solid #F5EDD4;padding-bottom:5px;margin-bottom:9px">${s.label}</div>`;
     s.fields.forEach(f=>{
-      const[status,,label,,hint]=f,key=mk(label),val=allData[pid]?.[fc]?.[key]||"";
-      html+=`<div style="margin-bottom:8px;border:1px solid #DDD6C8;border-radius:6px;overflow:hidden"><div style="background:${status===O?"#FBF8EE":"#F0EDE6"};padding:5px 10px;font-size:10px;font-weight:${status===O?"700":"400"};color:${status===O?"#8B6A18":"#56524A"}">${label} ${status===O?"★":""}</div><div style="padding:7px 10px;font-size:12px;min-height:24px;color:${val?"#1C1A14":"#C4BFB6"}">${val||hint||"—"}</div></div>`;
+      const[status,,label,,hint,note]=f,val=allData[pid]?.[fc]?.[mk(label)]||"";
+      if(!val&&status!=="Obligatoire")return;
+      html+=`<div style="margin-bottom:7px;border:1px solid #DDD6C8;border-radius:3px;overflow:hidden">
+        <div style="background:${status==="Obligatoire"?"#FBF8EE":"#F8F5EF"};padding:4px 9px;font-size:10px;font-weight:${status==="Obligatoire"?"700":"400"};color:${status==="Obligatoire"?"#8B6A18":"#5C5C54"}">
+          ${label}${status==="Obligatoire"?" ★":""}${note?` — ⚠ ${note}`:""}
+        </div>
+        <div style="padding:6px 9px;font-size:12px;color:${val?"#1C1A14":"#C4BFB6"};min-height:20px;white-space:pre-wrap">${val||"—"}</div>
+      </div>`;
     });
+    html+=`</div>`;
   });
+  const obs=allData[pid]?.[fc]?.["__obs"];
+  if(obs)html+=`<div style="margin-top:14px;padding:10px;background:#F0EDE6;border-radius:3px"><div style="font-size:9px;font-weight:700;color:#9A9690;text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px">Observations</div><div style="font-size:12px;color:#1C1A14;white-space:pre-wrap">${obs}</div></div>`;
+  html+=`</div>`;
   area.innerHTML=html;window.print();area.innerHTML=orig;renderFields();
 }
+
+// CSV — fiche complète
+function exportFicheCSV(){
+  closeDrawer("export-drawer");
+  const form=config[aF],fc=form.code;
+  const proj=projects.find(p=>p.id===pid)||{};
+  const rows=[["Projet","Référence","Formulaire","Section","Champ","Statut","Rôle","Type","Valeur"]];
+  form.sections.forEach(s=>s.fields.forEach(f=>{
+    const[status,role,label,type]=f,val=allData[pid]?.[fc]?.[mk(label)]||"";
+    rows.push([proj.name||"",proj.ref||"",form.title,s.label,label,status,role,type,val]);
+  }));
+  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
+  dl(new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"}),`PKRO_${fc}_complet_${today()}.csv`);
+}
+
+// Texte — fiche complète
+function exportFicheText(){
+  closeDrawer("export-drawer");
+  const form=config[aF],fc=form.code;
+  const proj=projects.find(p=>p.id===pid)||{};
+  let text=`${proj.name||"Projet"} · ${proj.ref||""}\n${form.code} — ${form.title}\n${"=".repeat(55)}\n\n`;
+  form.sections.forEach(s=>{
+    let secText="";
+    s.fields.forEach(f=>{const[,,label]=f,val=allData[pid]?.[fc]?.[mk(label)];if(val)secText+=`${label} : ${val}\n`});
+    if(secText)text+=`${s.label.toUpperCase()}\n${"-".repeat(35)}\n${secText}\n`;
+  });
+  const obs=allData[pid]?.[fc]?.["__obs"];
+  if(obs)text+=`OBSERVATIONS\n${"-".repeat(35)}\n${obs}\n`;
+  navigator.clipboard.writeText(text).then(()=>showPill("✓ Copié")).catch(()=>alert("Copié."));
+}
+
 function exportData(){
   closeDrawer("export-drawer");
   const p=projects.find(p=>p.id===pid);
@@ -1037,27 +1191,162 @@ function exportConfig(){
   closeDrawer("export-drawer");
   dl(new Blob([JSON.stringify(config,null,2)],{type:"application/json"}),`PKRO_Config_${today()}.json`);
 }
-function exportCSV(){
+function copyText(){closeDrawer("export-drawer");exportFicheText();}
+
+// ── DOCUMENT GENERATION ───────────────────────────────────────────────────────
+const DOC_CFG={
+  teaser:{title:"Investment Teaser",forms:["F01","F03","F04","F06","F07","F08"],
+    prompt:d=>`Tu es expert en montage immobilier pour Property Kro CI (PKRO), Abidjan.
+Rédige un Investment Teaser professionnel en français à partir des données ci-dessous.
+
+STRUCTURE OBLIGATOIRE :
+1. EN-TÊTE — Nom · Référence · Type · Localisation
+2. SYNTHÈSE EXÉCUTIVE — 5 lignes max
+3. OPPORTUNITÉ — 3-5 bullets : contexte et thèse
+4. PROGRAMME — Nature travaux, surface, unités, usage
+5. MARCHÉ — Prix observés, comparables, demande
+6. FINANCIERS CLÉS — Coût total, recettes, marge, TRI si dispo
+7. STRUCTURE DE FINANCEMENT — Montant, type, conditions
+8. POINTS FORTS — 3-5 différenciants
+9. PROCHAINES ÉTAPES — Action immédiate proposée par PKRO
+
+Ton : professionnel, direct, executive-ready. Si info manquante : [À COMPLÉTER].
+
+DONNÉES :
+${JSON.stringify(d,null,2)}`},
+  termsheet:{title:"Term Sheet",forms:["F01","F02","F09"],
+    prompt:d=>`Tu es expert en structuration financière pour Property Kro CI (PKRO), Côte d'Ivoire.
+Rédige un Term Sheet structuré en français.
+
+STRUCTURE :
+1. PARTIES — Émetteur / Emprunteur / SPV / Cible financeur
+2. STRUCTURE DU FINANCEMENT — Type, montant, fonds propres, dette, LTC/LTV
+3. CONDITIONS FINANCIÈRES — Taux, durée, différé, décaissement
+4. GARANTIES & SÛRETÉS
+5. CONDITIONS PRÉALABLES AU CLOSING
+6. POINTS OUVERTS
+7. VALIDITÉ & DROIT APPLICABLE (droit ivoirien / OHADA)
+
+Note : "Document non contraignant — à titre indicatif"
+Montant non renseigné → [MONTANT À CONFIRMER]
+
+DONNÉES :
+${JSON.stringify(d,null,2)}`},
+  memo:{title:"Investment Memo",forms:["F01","F02","F03","F04","F05","F06","F07","F08","F09","F10","F11"],
+    prompt:d=>`Tu es analyste senior en investissement immobilier, Property Kro CI (PKRO), Abidjan.
+Rédige un Investment Memo interne en français, qualité Bain/BCG adapté à l'immobilier ivoirien.
+
+STRUCTURE :
+1. SYNTHÈSE EXÉCUTIVE — Recommandation (Avancer/Approfondir/Décliner) + 5 lignes
+2. CONTEXTE & OPPORTUNITÉ
+3. DESCRIPTION DU PROJET
+4. ANALYSE DE MARCHÉ
+5. ANALYSE FINANCIÈRE
+6. STRUCTURE DE FINANCEMENT
+7. ANALYSE DES RISQUES — Top 5 + mitigants
+8. ÉQUIPE & EXÉCUTION
+9. PLANNING & READINESS
+10. GAPS & QUESTIONS OUVERTES
+11. RECOMMANDATION & PROCHAINES ÉTAPES
+
+Ton : analytique, direct, recommandation tranchée. Info manquante → [INFORMATION MANQUANTE].
+
+DONNÉES :
+${JSON.stringify(d,null,2)}`},
+  pipeline:{title:"Fiche Pipeline 1 page",forms:["F01","F03","F07","F08","F11"],
+    prompt:d=>`Tu es chef de projet chez Property Kro CI (PKRO).
+Rédige une fiche pipeline d'UNE PAGE en français pour la revue hebdomadaire PKRO.
+
+FORMAT STRICT :
+PROJET : [Nom] · [Réf] · [Stade]
+LOCALISATION : [Ville, commune, quartier]
+TYPE : [Type + mode deal]
+────────────────────────────
+SYNTHÈSE : 3 lignes max
+────────────────────────────
+FINANCIERS CLÉS :
+• Coût total :
+• Recettes attendues :
+• Marge :
+• Prix marché estimé :
+────────────────────────────
+STADE & READINESS :
+• Statut juridique :
+• Permis :
+• Niveau readiness :
+────────────────────────────
+PROCHAINE ACTION : [Action · Owner · Date]
+VERDICT PKRO : [Avancer / Approfondir / Surveiller / Décliner]
+────────────────────────────
+GAPS CRITIQUES : (max 3 bullets)
+
+Ultra-concis, factuel, zéro remplissage.
+
+DONNÉES :
+${JSON.stringify(d,null,2)}`},
+  readiness:{title:"Readiness Sheet",forms:["F01","F05","F11","F12"],
+    prompt:d=>`Tu es gestionnaire de projet immobilier, Property Kro CI (PKRO).
+Rédige un Readiness Sheet en français évaluant l'état de préparation réel du dossier.
+
+STRUCTURE :
+1. IDENTIFICATION — Projet, référence, date
+2. SCORE GLOBAL DE READINESS — Note /10 + justification 2 lignes
+3. STATUT JURIDIQUE & FONCIER
+4. STATUT DOCUMENTAIRE — Disponible vs manquant
+5. STATUT PLANNING — Calendrier, jalons, dépendances
+6. GAPS BLOQUANTS — Max 5, priorisés
+7. GAPS IMPORTANTS NON BLOQUANTS
+8. ACTIONS IMMÉDIATES — 3 actions · owner · deadline
+9. CONDITION POUR PASSAGE AU STADE SUIVANT
+
+Opérationnel, sans complaisance. Décision en 2 minutes.
+
+DONNÉES :
+${JSON.stringify(d,null,2)}`}
+};
+
+async function generateDoc(type){
   closeDrawer("export-drawer");
-  const form=config[aF],fc=form.code;
-  const rows=[["Formulaire","Section","Champ","Statut","Rôle","Type","Valeur"]];
-  form.sections.forEach(s=>s.fields.forEach(f=>{
-    const[status,role,label,type]=f,val=allData[pid]?.[fc]?.[mk(label)]||"";
-    rows.push([form.title,s.label,label,status,role,type,val]);
-  }));
-  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
-  dl(new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"}),`PKRO_${fc}_${today()}.csv`);
+  const cfg=DOC_CFG[type];if(!cfg)return;
+  const proj=projects.find(p=>p.id===pid)||{};
+
+  document.getElementById("doc-drawer-title").textContent=cfg.title;
+  document.getElementById("doc-drawer-meta").textContent=`${proj.name||"Projet"} · ${proj.ref||""} · ${today()}`;
+  document.getElementById("doc-loading").style.display="block";
+  document.getElementById("doc-content").style.display="none";
+  document.getElementById("doc-actions").style.display="none";
+  openDrawer("doc-drawer");
+
+  const msgs=["Analyse des données du projet...","Structuration du document...","Rédaction en cours...","Finalisation..."];
+  let mi=0;
+  const lt=setInterval(()=>{document.getElementById("doc-loading-sub").textContent=msgs[mi++%msgs.length]},1800);
+
+  try{
+    const snap=collectProjectSnapshot(cfg.forms);
+    const res=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:2000,messages:[{role:"user",content:cfg.prompt(snap)}]})
+    });
+    clearInterval(lt);
+    const data=await res.json();
+    const text=data.content?.map(c=>c.text||"").join("")||"Erreur de génération.";
+    document.getElementById("doc-loading").style.display="none";
+    document.getElementById("doc-content").style.display="block";
+    document.getElementById("doc-content").textContent=text;
+    document.getElementById("doc-actions").style.display="flex";
+  }catch(e){
+    clearInterval(lt);
+    document.getElementById("doc-loading").style.display="none";
+    document.getElementById("doc-content").style.display="block";
+    document.getElementById("doc-content").textContent="Erreur : "+e.message+"\n\nVérifiez votre connexion et réessayez.";
+    document.getElementById("doc-actions").style.display="flex";
+  }
 }
-function copyText(){
-  closeDrawer("export-drawer");
-  const form=config[aF],fc=form.code;
-  let text=`${form.code} — ${form.title}\n${"=".repeat(50)}\n\n`;
-  form.sections.forEach(s=>{
-    text+=`${s.label.toUpperCase()}\n${"-".repeat(30)}\n`;
-    s.fields.forEach(f=>{const[,,label]=f,val=allData[pid]?.[fc]?.[mk(label)];if(val)text+=`${label}: ${val}\n`});
-    text+="\n";
-  });
-  navigator.clipboard.writeText(text).then(()=>{const pill=document.getElementById("save-pill");pill.textContent="✓ Copié";pill.classList.add("show");setTimeout(()=>{pill.classList.remove("show");pill.textContent="✓ Sauvegardé"},1600)}).catch(()=>alert("Copié."));
+
+function copyDocContent(){
+  navigator.clipboard.writeText(document.getElementById("doc-content").textContent)
+    .then(()=>showPill("✓ Copié")).catch(()=>alert("Copié."));
 }
 function importConfig(e){
   const file=e.target.files[0];if(!file)return;
