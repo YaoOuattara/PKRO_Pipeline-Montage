@@ -310,6 +310,7 @@ textarea::placeholder{color:var(--faint)}
       <div class="topbar-sub" id="app-proj-ref"></div>
     </div>
     <div class="topbar-actions">
+      <button class="icon-btn" onclick="refreshFromDB()" title="Synchroniser" id="sync-btn">🔄</button>
       <button class="icon-btn" onclick="openDrawer('export-drawer')" title="Exporter">↓</button>
       <button class="icon-btn" id="admin-btn" onclick="toggleAdmin()" title="Admin">⚙</button>
     </div>
@@ -620,8 +621,9 @@ async function load(){
     // Logo from localStorage (device-specific, fine)
     try{const l=localStorage.getItem("pkro_logo_v4");if(l){logoUrl=l;applyLogo()}}catch{}
     dbReady=true;
-    showPill("✓ Connecté");
-    console.log("Supabase loaded:",{projects:projects.length,config:config.length});
+    const hasData=projects.length>0||Object.keys(allData).length>0;
+    showPill("✓ "+projects.length+" projet(s) chargé(s)");
+    console.log("Supabase loaded:",{projects:projects.length,formDataRows:Object.keys(allData).length,config:config.length});
   } catch(e){
     console.error("Supabase load error:",e);
     showPill("⚠ Mode hors-ligne - vérifiez la connexion","var(--red)");
@@ -638,20 +640,30 @@ function saveAll(){ /* kept for compat — real saves go through sv() */ }
 
 function gv(k){return allData[pid]?.[config[aF]?.code]?.[k]??""}
 
+function isUUID(id){return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);}
+
 function sv(k,v){
   const fc=config[aF].code;
   if(!allData[pid])allData[pid]={};
   if(!allData[pid][fc])allData[pid][fc]={};
   allData[pid][fc][k]=v;
   updProg();
-  // Debounced Supabase upsert
+  // Debounced Supabase upsert — only if pid is a real UUID
   const dkey=pid+"_"+fc+"_"+k;
   clearTimeout(_debounce[dkey]);
   _debounce[dkey]=setTimeout(async()=>{
-    if(!dbReady){localStorage.setItem("pkro_data_v4",JSON.stringify(allData));return;}
+    if(!dbReady||!isUUID(pid)){
+      // pid is still a local temp id — try to get real UUID first
+      if(!isUUID(pid)){
+        console.warn("Skipping sync: project not yet synced to Supabase (id="+pid+")");
+        return;
+      }
+      localStorage.setItem("pkro_data_v4",JSON.stringify(allData));return;
+    }
     showPill("💾 Sauvegarde...","var(--gold-dk)");
-    await sb.upsert("form_data",{project_id:pid,form_code:fc,field_key:k,field_value:v,updated_at:new Date().toISOString()});
-    showPill("✓ Sauvegardé");
+    const result=await sb.upsert("form_data",{project_id:pid,form_code:fc,field_key:k,field_value:v,updated_at:new Date().toISOString()});
+    if(result) showPill("✓ Sauvegardé");
+    else showPill("⚠ Sync échouée","var(--red)");
   },600);
 }
 
@@ -747,9 +759,24 @@ async function createProject(){
       const rows=await sb.post("projects",{name,ref,type});
       const row=Array.isArray(rows)?rows[0]:rows;
       if(row&&row.id){
+        const realId=row.id;
         const idx=projects.findIndex(p=>p.id===localId);
-        if(idx>=0){projects[idx].id=row.id;projects[idx].createdAt=row.created_at||projects[idx].createdAt;}
-        if(allData[localId]){allData[row.id]=allData[localId];delete allData[localId];}
+        if(idx>=0){projects[idx].id=realId;projects[idx].createdAt=row.created_at||projects[idx].createdAt;}
+        // Migrate any form data written under temp local id
+        if(allData[localId]){
+          allData[realId]=allData[localId];
+          delete allData[localId];
+          // If current project is this one, update pid
+          if(pid===localId)pid=realId;
+          // Re-sync all pending form data to Supabase with real UUID
+          const pending=allData[realId]||{};
+          for(const fc of Object.keys(pending)){
+            for(const [fk,fv] of Object.entries(pending[fc]||{})){
+              if(fv) await sb.upsert("form_data",{project_id:realId,form_code:fc,field_key:fk,field_value:fv,updated_at:new Date().toISOString()});
+            }
+          }
+          console.log("Synced pending data to Supabase for project:",realId);
+        }
       }
     }catch(e){console.warn("Supabase sync failed:",e);}
   } else {
@@ -1440,6 +1467,35 @@ function importConfig(e){
 }
 function dl(blob,name){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;a.click()}
 function today(){return new Date().toISOString().slice(0,10)}
+
+// ── MANUAL REFRESH ───────────────────────────────────────────────────────────
+async function refreshFromDB(){
+  const btn=document.getElementById("sync-btn");
+  if(btn)btn.style.animation="spin 1s linear infinite";
+  showPill("🔄 Synchronisation...","var(--gold-dk)");
+  try{
+    // Reload projects
+    const projRows=await sb.get("projects","order=created_at.desc");
+    projects=(projRows||[]).map(p=>({id:p.id,name:p.name,ref:p.ref||"",type:p.type||"",createdAt:p.created_at}));
+    // Reload ALL form data
+    const dataRows=await sb.get("form_data","order=updated_at.desc");
+    allData={};
+    (dataRows||[]).forEach(row=>{
+      if(!allData[row.project_id])allData[row.project_id]={};
+      if(!allData[row.project_id][row.form_code])allData[row.project_id][row.form_code]={};
+      allData[row.project_id][row.form_code][row.field_key]=row.field_value||"";
+    });
+    showPill("✓ Synchronisé — "+projects.length+" projet(s)");
+    // Re-render current view
+    if(pid) renderFields();
+    renderSidebar();
+    updProg();
+  }catch(e){
+    showPill("⚠ Erreur de sync","var(--red)");
+    console.error("Refresh error:",e);
+  }
+  if(btn)btn.style.animation="";
+}
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 load().then(()=>{renderProjects();});
