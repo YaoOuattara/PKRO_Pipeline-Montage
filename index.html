@@ -1147,123 +1147,147 @@ function collectProjectSnapshot(formCodes){
   return snap;
 }
 
-// ── WORD EXPORT (.docx via HTML conversion) ──────────────────────────────────
+// ── WORD EXPORT via RTF (compatible Word, Pages, Google Docs) ────────────────
 function exportFicheWord(){
   closeDrawer("export-drawer");
   const form=config[aF],fc=form.code;
   const proj=projects.find(p=>p.id===pid)||{};
 
-  // Build full HTML document styled for Word
-  let body="";
+  // RTF format — opens natively in Word, Pages, LibreOffice on all devices
+  const esc=s=>String(s||"").replace(/\\/g,"\\\\").replace(/[{}]/g,"\\$&")
+    .replace(/[^ -]/g,c=>{const code=c.charCodeAt(0);return code<256?"\\'"+code.toString(16).padStart(2,"0"):"\\u"+code+"?"});
+
+  let rtf="{\\rtf1\\ansi\\deff0
+";
+  rtf+="{\\fonttbl{\\f0\\fswiss Arial;}{\\f1\\froman Georgia;}}
+";
+  rtf+="{\\colortbl;\\red28\\green26\\blue20;\\red139\\green106\\blue24;\\red92\\green92\\blue84;\\red200\\green200\\blue200;}
+";
+  rtf+="\\margl1440\\margr1440\\margt1440\\margb1440
+";
+
+  // Header
+  rtf+=`{\\f1\\fs32\\b\\cf2 ${esc(form.code)} - ${esc(form.title)}}\\par
+`;
+  rtf+=`{\\f0\\fs18\\cf3 ${esc(proj.name||"")} - ${esc(proj.ref||"")} - ${today()}}\\par
+`;
+  rtf+="\\par\\brdrb\\brdrs\\brdrw10\\brdrsp20\\par
+";
+
   form.sections.forEach(s=>{
-    let secRows="";
+    let hasContent=s.fields.some(f=>allData[pid]?.[fc]?.[mk(f[2])]);
+    if(!hasContent)return;
+
+    // Section header
+    rtf+=`\\par{\\f0\\fs20\\b\\cf2\\caps ${esc(s.label)}}\\par
+`;
+    rtf+="\\brdrb\\brdrs\\brdrw5\\par
+";
+
     s.fields.forEach(f=>{
-      const[status,role,label,,,,]=f;
+      const[status,,label]=f;
       const val=allData[pid]?.[fc]?.[mk(label)]||"";
-      if(!val)return; // only filled fields
-      secRows+=`<tr>
-        <td style="background:${status==="Obligatoire"?"#FBF8EE":"#F8F5EF"};padding:6pt 8pt;border:1pt solid #DDD6C8;font-size:9pt;font-weight:${status==="Obligatoire"?"bold":"normal"};color:${status==="Obligatoire"?"#8B6A18":"#5C5C54"};width:35%;vertical-align:top">${label}${status==="Obligatoire"?" ★":""}</td>
-        <td style="padding:6pt 8pt;border:1pt solid #DDD6C8;font-size:10pt;color:#1C1A14;white-space:pre-wrap;vertical-align:top">${val}</td>
-      </tr>`;
+      if(!val)return;
+      // Label + value
+      rtf+=`{\\f0\\fs17\\b\\cf2 ${esc(label)}${status==="Obligatoire"?" \\u9733?":""}}\\par
+`;
+      rtf+=`{\\f0\\fs19\\cf1 ${esc(val)}}\\par\\par
+`;
     });
-    if(!secRows)return;
-    body+=`
-      <h3 style="font-size:9pt;font-weight:bold;text-transform:uppercase;letter-spacing:1pt;color:#8B6A18;border-bottom:2pt solid #F5EDD4;padding-bottom:4pt;margin:14pt 0 6pt">${s.label}</h3>
-      <table style="width:100%;border-collapse:collapse;margin-bottom:12pt">${secRows}</table>`;
   });
 
+  // Observations
   const obs=allData[pid]?.[fc]?.["__obs"];
-  if(obs) body+=`<h3 style="font-size:9pt;font-weight:bold;text-transform:uppercase;letter-spacing:1pt;color:#8B6A18;border-bottom:2pt solid #F5EDD4;padding-bottom:4pt;margin:14pt 0 6pt">Observations</h3><p style="font-size:10pt;color:#1C1A14;white-space:pre-wrap">${obs}</p>`;
+  if(obs){
+    rtf+="\\par{\\f0\\fs20\\b\\cf2\\caps Observations}\\par
+";
+    rtf+=`{\\f0\\fs19\\cf1 ${esc(obs)}}\\par
+`;
+  }
 
-  const html=`
-    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
-    <head><meta charset="UTF-8">
-    <style>
-      @page { margin: 2cm; }
-      body { font-family: Arial, sans-serif; font-size: 10pt; color: #1C1A14; }
-      table { border-collapse: collapse; width: 100%; }
-    </style>
-    </head>
-    <body>
-      <table style="width:100%;border-bottom:3pt solid #C9A84C;margin-bottom:16pt;border-collapse:collapse">
-        <tr>
-          <td style="border:none;padding:0 0 8pt 0">
-            <div style="font-size:8pt;font-weight:bold;letter-spacing:2pt;text-transform:uppercase;color:#C9A84C;margin-bottom:4pt">${form.code} — Property Kro CI</div>
-            <div style="font-size:18pt;font-weight:bold;color:#1C1A14;font-family:Georgia,serif">${form.title}</div>
-          </td>
-          <td style="border:none;padding:0 0 8pt 0;text-align:right;vertical-align:bottom">
-            <div style="font-size:11pt;font-weight:bold;color:#1C1A14">${proj.name||""}</div>
-            <div style="font-size:9pt;color:#9A9690">${proj.ref||""} · ${today()}</div>
-          </td>
-        </tr>
-      </table>
-      ${body}
-      <p style="margin-top:20pt;font-size:8pt;color:#9A9690;border-top:1pt solid #DDD6C8;padding-top:6pt">
-        Property Kro CI — Document confidentiel — Généré le ${today()}
-      </p>
-    </body></html>`;
+  // Footer
+  rtf+="\\par\\brdrb\\brdrs\\brdrw5\\par
+";
+  rtf+=`{\\f0\\fs15\\cf3 Property Kro CI - Document confidentiel - ${today()}}\\par
+`;
+  rtf+="}";
 
-  const blob=new Blob(["﻿"+html],{type:"application/msword;charset=utf-8"});
-  dl(blob,`PKRO_${fc}_${proj.ref||"projet"}_${today()}.doc`);
+  const blob=new Blob([rtf],{type:"application/rtf"});
+  dl(blob,`PKRO_${fc}_${proj.ref||"projet"}_${today()}.rtf`);
 }
-
-// ── PDF — fiche complète propre via impression ────────────────────────────────
+// ── PDF — fiche complète via nouvelle fenêtre ───────────────────────────────
 function exportFichePDFClean(){
   closeDrawer("export-drawer");
   const form=config[aF],fc=form.code;
   const proj=projects.find(p=>p.id===pid)||{};
-  const area=document.getElementById("fields-area"),orig=area.innerHTML;
 
-  let html=`<div style="font-family:Arial,sans-serif;max-width:760px;margin:0 auto;padding:0">
-    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:18px;padding-bottom:10px;border-bottom:3px solid #C9A84C">
-      <div>
-        <div style="font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#C9A84C;margin-bottom:4px">${form.code} — PROPERTY KRO CI</div>
-        <div style="font-family:Georgia,serif;font-size:20px;font-weight:700;color:#1C1A14">${form.title}</div>
-      </div>
-      <div style="text-align:right">
-        <div style="font-size:12px;font-weight:700;color:#1C1A14">${proj.name||""}</div>
-        <div style="font-size:10px;color:#9A9690">${proj.ref||""} · ${today()}</div>
-      </div>
-    </div>`;
-
+  let sections="";
   form.sections.forEach(s=>{
     let rows="";
     s.fields.forEach(f=>{
       const[status,,label]=f;
       const val=allData[pid]?.[fc]?.[mk(label)]||"";
       if(!val)return;
-      rows+=`<div style="display:flex;border:1px solid #DDD6C8;border-top:none;overflow:hidden">
-        <div style="width:35%;padding:5px 8px;background:${status==="Obligatoire"?"#FBF8EE":"#F8F5EF"};font-size:10px;font-weight:${status==="Obligatoire"?"700":"400"};color:${status==="Obligatoire"?"#8B6A18":"#5C5C54"};flex-shrink:0;border-right:1px solid #DDD6C8">${label}${status==="Obligatoire"?" ★":""}</div>
-        <div style="padding:5px 8px;font-size:11px;color:#1C1A14;white-space:pre-wrap;flex:1">${val}</div>
+      rows+=`<div style="display:flex;margin-bottom:6px;border:1px solid #DDD6C8;border-radius:3px;overflow:hidden">
+        <div style="width:34%;padding:6px 10px;background:${status==="Obligatoire"?"#FBF8EE":"#F8F5EF"};font-size:10px;font-weight:${status==="Obligatoire"?"700":"400"};color:${status==="Obligatoire"?"#8B6A18":"#5C5C54"};flex-shrink:0;border-right:1px solid #DDD6C8">
+          ${label}${status==="Obligatoire"?" ★":""}
+        </div>
+        <div style="padding:6px 10px;font-size:11px;color:#1C1A14;flex:1;white-space:pre-wrap;word-break:break-word">${val}</div>
       </div>`;
     });
     if(!rows)return;
-    html+=`<div style="margin-bottom:16px">
-      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#8B6A18;background:#F5EDD4;padding:5px 8px;border:1px solid #DDD6C8">${s.label}</div>
+    sections+=`<div style="margin-bottom:18px;page-break-inside:avoid">
+      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#8B6A18;background:#F5EDD4;padding:5px 10px;border:1px solid #DDD6C8;margin-bottom:0">${s.label}</div>
       ${rows}
     </div>`;
   });
 
   const obs=allData[pid]?.[fc]?.["__obs"];
-  if(obs) html+=`<div style="margin-top:14px;padding:10px;background:#F0EDE6;border:1px solid #DDD6C8">
+  if(obs) sections+=`<div style="margin-top:14px;padding:10px;background:#F0EDE6;border:1px solid #DDD6C8;border-radius:3px">
     <div style="font-size:9px;font-weight:700;color:#9A9690;text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px">Observations</div>
     <div style="font-size:11px;color:#1C1A14;white-space:pre-wrap">${obs}</div>
   </div>`;
 
-  html+=`<div style="margin-top:18px;font-size:8px;color:#9A9690;border-top:1px solid #DDD6C8;padding-top:5px">Property Kro CI — Document confidentiel — Généré le ${today()}</div></div>`;
+  const html=`<!DOCTYPE html><html lang="fr"><head>
+    <meta charset="UTF-8">
+    <title>${form.code} — ${proj.name||"Projet"}</title>
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0}
+      body{font-family:Arial,sans-serif;padding:28px;color:#1C1A14;font-size:12px}
+      @media print{
+        body{padding:14px}
+        @page{margin:1.5cm;size:A4}
+        .no-print{display:none}
+      }
+    </style>
+  </head><body>
+    <!-- Header -->
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:12px;border-bottom:3px solid #C9A84C;margin-bottom:20px">
+      <div>
+        <div style="font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#C9A84C;margin-bottom:4px">${form.code} — PROPERTY KRO CI</div>
+        <div style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#1C1A14">${form.title}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:12px;font-weight:700">${proj.name||""}</div>
+        <div style="font-size:10px;color:#9A9690">${proj.ref||""} · ${today()}</div>
+      </div>
+    </div>
+    <!-- Content -->
+    ${sections||"<p style='color:#9A9690;font-style:italic'>Aucun champ rempli dans cette fiche.</p>"}
+    <!-- Footer -->
+    <div style="margin-top:20px;padding-top:8px;border-top:1px solid #DDD6C8;font-size:9px;color:#9A9690">
+      Property Kro CI — Document confidentiel — Généré le ${today()}
+    </div>
+    <!-- Auto print -->
+    <script>window.onload=function(){window.print()}<\/script>
+  </body></html>`;
 
-  // Inject print styles and trigger
-  const style=document.createElement("style");
-  style.id="print-override";
-  style.textContent=`@media print{body>*:not(#print-frame){display:none!important}#print-frame{display:block!important}}`;
-  document.head.appendChild(style);
-  const frame=document.createElement("div");
-  frame.id="print-frame";frame.innerHTML=html;
-  document.body.appendChild(frame);
-  window.print();
-  document.head.removeChild(style);
-  document.body.removeChild(frame);
+  // Open in new window — full document, then print
+  const w=window.open("","_blank","width=900,height=700");
+  if(w){ w.document.write(html); w.document.close(); }
+  else { alert("Popup bloquée. Autoriser les popups pour ce site dans votre navigateur."); }
 }
+
 
 // Texte — fiche complète
 function exportFicheText(){
