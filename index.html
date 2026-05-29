@@ -569,7 +569,8 @@ const sb = {
   },
   async post(table, body){
     const r=await fetch(`${SUPABASE_URL}/rest/v1/${table}`,{method:"POST",headers:{...sb.headers,"Prefer":"return=representation"},body:JSON.stringify(body)});
-    return r.ok?r.json():null;
+    if(!r.ok){const err=await r.text();console.error("Supabase POST error:",r.status,err);return null;}
+    return r.json();
   },
   async patch(table, params, body){
     const r=await fetch(`${SUPABASE_URL}/rest/v1/${table}?${params}`,{method:"PATCH",headers:{...sb.headers,"Prefer":"return=representation"},body:JSON.stringify(body)});
@@ -580,7 +581,8 @@ const sb = {
   },
   async upsert(table, body){
     const r=await fetch(`${SUPABASE_URL}/rest/v1/${table}`,{method:"POST",headers:{...sb.headers,"Prefer":"resolution=merge-duplicates,return=representation"},body:JSON.stringify(body)});
-    return r.ok?r.json():null;
+    if(!r.ok){const err=await r.text();console.error("Supabase UPSERT error:",r.status,err);return null;}
+    return r.json();
   }
 };
 
@@ -623,9 +625,10 @@ async function load(){
     try{const l=localStorage.getItem("pkro_logo_v4");if(l){logoUrl=l;applyLogo()}}catch{}
     dbReady=true;
     showPill("✓ Connecté");
+    console.log("Supabase loaded:",{projects:projects.length,config:config.length});
   } catch(e){
     console.error("Supabase load error:",e);
-    showPill("⚠ Mode hors-ligne","var(--red)");
+    showPill("⚠ Mode hors-ligne - vérifiez la connexion","var(--red)");
     // Fallback to localStorage
     try{projects=JSON.parse(localStorage.getItem("pkro_proj_v4")||"[]")}catch{projects=[]}
     try{allData=JSON.parse(localStorage.getItem("pkro_data_v4")||"{}")}catch{allData={}}
@@ -732,20 +735,30 @@ function projPct(id){
 async function createProject(){
   const name=document.getElementById("np-name").value.trim();
   if(!name){alert("Le nom du projet est requis.");return}
-  const ref=document.getElementById("np-ref").value.trim()||`PKR-${new Date().getFullYear()}-${String(projects.length+1).padStart(3,"0")}`;
+  const ref=document.getElementById("np-ref").value.trim()||"PKR-"+new Date().getFullYear()+"-"+String(projects.length+1).padStart(3,"0");
   const type=document.getElementById("np-type").value;
-  showPill("💾 Création...","var(--gold-dk)");
-  if(dbReady){
-    const rows=await sb.post("projects",{name,ref,type});
-    const row=Array.isArray(rows)?rows[0]:rows;
-    if(row){projects.unshift({id:row.id,name:row.name,ref:row.ref||"",type:row.type||"",createdAt:row.created_at});}
-  } else {
-    projects.unshift({id:"p_"+Date.now(),name,ref,type,createdAt:new Date().toISOString()});
-    localStorage.setItem("pkro_proj_v4",JSON.stringify(projects));
-  }
+  showPill("Création...","var(--gold-dk)");
+  // Always add locally first so UI updates immediately
+  const localId="p_"+Date.now();
+  projects.unshift({id:localId,name,ref,type,createdAt:new Date().toISOString()});
   ["np-name","np-ref"].forEach(id=>document.getElementById(id).value="");
   document.getElementById("np-type").value="";
-  showPill("✓ Projet créé");renderProjects();
+  renderProjects();
+  showPill("Projet créé");
+  // Then sync to Supabase and swap id if successful
+  if(dbReady){
+    try{
+      const rows=await sb.post("projects",{name,ref,type});
+      const row=Array.isArray(rows)?rows[0]:rows;
+      if(row&&row.id){
+        const idx=projects.findIndex(p=>p.id===localId);
+        if(idx>=0){projects[idx].id=row.id;projects[idx].createdAt=row.created_at||projects[idx].createdAt;}
+        if(allData[localId]){allData[row.id]=allData[localId];delete allData[localId];}
+      }
+    }catch(e){console.warn("Supabase sync failed:",e);}
+  } else {
+    localStorage.setItem("pkro_proj_v4",JSON.stringify(projects));
+  }
 }
 
 async function dupProject(id){
