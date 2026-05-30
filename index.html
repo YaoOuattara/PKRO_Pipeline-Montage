@@ -359,7 +359,10 @@ textarea::placeholder{color:var(--faint)}
     <div class="drawer-title">Exporter & Générer</div>
 
     <!-- SECTION: EXPORT -->
-    <div style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:0 0 10px">Export — Fiche active (champs remplis uniquement)</div>
+    <div style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:0 0 10px">Export — Fiche active</div>
+    <div style="font-size:11px;color:var(--muted);background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 12px;margin-bottom:12px;line-height:1.6">
+      ⚠ L'export inclut uniquement les champs remplis. Les champs vides ne sont pas exportés.
+    </div>
     <div class="drawer-opts">
       <button class="drawer-opt" onclick="exportFicheWord()">
         <strong>📝 Word (.docx) — Fiche complète</strong>
