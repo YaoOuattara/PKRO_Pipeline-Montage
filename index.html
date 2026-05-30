@@ -1030,7 +1030,15 @@ function renderFields(){
         ta.addEventListener("input",e=>sv(key,e.target.value));body.appendChild(ta);
       } else {
         const inp=document.createElement("input");inp.type=type==="number"?"number":type==="date"?"date":"text";
-        inp.value=val;if(hint)inp.placeholder=hint;
+        // Pre-fill from project metadata if F01 and field is empty
+        let fieldVal=val;
+        if(!fieldVal&&fc==="F01"){
+          const proj=projects.find(p=>p.id===pid)||{};
+          if(key==="nom_du_projet"&&proj.name){fieldVal=proj.name;sv(key,proj.name);}
+          else if(key==="reference_interne_pkro"&&proj.ref){fieldVal=proj.ref;sv(key,proj.ref);}
+          else if(key==="type_de_projet"&&proj.type){fieldVal=proj.type;sv(key,proj.type);}
+        }
+        inp.value=fieldVal;if(hint)inp.placeholder=hint;
         inp.addEventListener("input",e=>sv(key,e.target.value));body.appendChild(inp);
       }
       card.appendChild(body);
