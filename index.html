@@ -1323,112 +1323,240 @@ function copyText(){closeDrawer("export-drawer");exportFicheText();}
 const DOC_CFG={
   teaser:{title:"Investment Teaser",forms:["F01","F03","F04","F06","F07","F08"],
     prompt:d=>`Tu es expert en montage immobilier pour Property Kro CI (PKRO), Abidjan.
-Rédige un Investment Teaser professionnel en français à partir des données ci-dessous.
 
-STRUCTURE OBLIGATOIRE :
-1. EN-TÊTE — Nom · Référence · Type · Localisation
-2. SYNTHÈSE EXÉCUTIVE — 5 lignes max
-3. OPPORTUNITÉ — 3-5 bullets : contexte et thèse
-4. PROGRAMME — Nature travaux, surface, unités, usage
-5. MARCHÉ — Prix observés, comparables, demande
-6. FINANCIERS CLÉS — Coût total, recettes, marge, TRI si dispo
-7. STRUCTURE DE FINANCEMENT — Montant, type, conditions
-8. POINTS FORTS — 3-5 différenciants
-9. PROCHAINES ÉTAPES — Action immédiate proposée par PKRO
+Rédige un Investment Teaser COMPLET et professionnel en français. Le document DOIT contenir TOUTES les 9 sections ci-dessous, même si certaines sont brèves. Concision impérative : bullets courts (1 ligne), pas de paragraphes longs, pas de remplissage rhétorique.
 
-Ton : professionnel, direct, executive-ready. Si info manquante : [À COMPLÉTER].
+STRUCTURE OBLIGATOIRE — les 9 sections doivent toutes être présentes :
 
-DONNÉES :
-${JSON.stringify(d,null,2)}`},
+1. EN-TÊTE
+   Nom du projet · Référence · Type · Localisation · Date
+
+2. SYNTHÈSE EXÉCUTIVE
+   3-4 lignes : ce qu\'est le projet, où il est, montant, opportunité
+
+3. OPPORTUNITÉ
+   3-4 bullets : contexte marché et thèse d\'investissement
+
+4. PROGRAMME
+   3-4 bullets : nature, surface, unités, usage, standing
+
+5. MARCHÉ
+   3-4 bullets : prix observés, demande, comparables
+
+6. FINANCIERS CLÉS
+   Tableau ou bullets : coût total, recettes, marge, TRI
+
+7. STRUCTURE DE FINANCEMENT
+   3-4 bullets : type, montant, fonds propres, dette, conditions
+
+8. POINTS FORTS
+   3-5 bullets différenciants
+
+9. PROCHAINES ÉTAPES
+   2-3 actions concrètes proposées par PKRO
+
+Si une information manque dans les données : [À COMPLÉTER]
+Ne JAMAIS omettre une section. Préférer "[À COMPLÉTER]" plutôt que de sauter une section.
+
+À LA FIN, ajoute exactement ces 3 lignes :
+---
+*Document de cadrage rapide généré automatiquement à partir des données saisies dans le système PKRO. Pour une version détaillée et exhaustive, contacter Nourdine Ouattara — Birdhouse / Nest Consulting.*
+
+DONNÉES DU PROJET :
+${JSON.stringify(d,null,2)}\``},
+
   termsheet:{title:"Term Sheet",forms:["F01","F02","F09"],
-    prompt:d=>`Tu es expert en structuration financière pour Property Kro CI (PKRO), Côte d'Ivoire.
-Rédige un Term Sheet structuré en français.
+    prompt:d=>`Tu es expert en structuration financière pour Property Kro CI (PKRO), Côte d\'Ivoire.
 
-STRUCTURE :
-1. PARTIES — Émetteur / Emprunteur / SPV / Cible financeur
-2. STRUCTURE DU FINANCEMENT — Type, montant, fonds propres, dette, LTC/LTV
-3. CONDITIONS FINANCIÈRES — Taux, durée, différé, décaissement
+Rédige un Term Sheet COMPLET en français. Le document DOIT contenir TOUTES les 7 sections ci-dessous. Format synthétique, tableaux quand possible, 1-2 lignes par condition.
+
+STRUCTURE OBLIGATOIRE — les 7 sections doivent toutes être présentes :
+
+1. PARTIES
+   • Émetteur / Emprunteur
+   • SPV (si applicable)
+   • Cible financeur
+
+2. STRUCTURE DU FINANCEMENT
+   • Type d\'instrument
+   • Montant total
+   • Fonds propres / Dette
+   • Ratio LTC ou LTV
+
+3. CONDITIONS FINANCIÈRES
+   • Taux d\'intérêt
+   • Durée
+   • Différé de remboursement
+   • Modalités de décaissement
+
 4. GARANTIES & SÛRETÉS
+   • Garanties proposées
+   • Cautions
+
 5. CONDITIONS PRÉALABLES AU CLOSING
+   • Due diligence
+   • Documentation requise
+   • Approbations nécessaires
+
 6. POINTS OUVERTS
-7. VALIDITÉ & DROIT APPLICABLE (droit ivoirien / OHADA)
+   • Éléments à négocier ou confirmer
 
-Note : "Document non contraignant — à titre indicatif"
-Montant non renseigné → [MONTANT À CONFIRMER]
+7. VALIDITÉ & DROIT APPLICABLE
+   • Durée de validité de l\'offre
+   • Droit applicable : droit ivoirien / OHADA
 
-DONNÉES :
-${JSON.stringify(d,null,2)}`},
+Mention obligatoire en haut du document :
+"DOCUMENT NON CONTRAIGNANT — À TITRE INDICATIF"
+
+Si une information manque : [MONTANT À CONFIRMER] ou [À NÉGOCIER]
+Ne JAMAIS omettre une section.
+
+À LA FIN, ajoute exactement ces 3 lignes :
+---
+*Document de cadrage rapide généré automatiquement à partir des données saisies dans le système PKRO. Pour une version détaillée et exhaustive, contacter Nourdine Ouattara — Birdhouse / Nest Consulting.*
+
+DONNÉES DU PROJET :
+${JSON.stringify(d,null,2)}\``},
+
   memo:{title:"Investment Memo",forms:["F01","F02","F03","F04","F05","F06","F07","F08","F09","F10","F11"],
     prompt:d=>`Tu es analyste senior en investissement immobilier, Property Kro CI (PKRO), Abidjan.
-Rédige un Investment Memo interne en français, qualité Bain/BCG adapté à l'immobilier ivoirien.
 
-STRUCTURE :
-1. SYNTHÈSE EXÉCUTIVE — Recommandation (Avancer/Approfondir/Décliner) + 5 lignes
+Rédige un Investment Memo COMPLET en français, qualité Bain/BCG adapté au marché ivoirien. Le document DOIT contenir TOUTES les 11 sections ci-dessous. Bullets concis, pas de paragraphes longs.
+
+STRUCTURE OBLIGATOIRE — les 11 sections doivent toutes être présentes :
+
+1. SYNTHÈSE EXÉCUTIVE
+   Recommandation tranchée : Avancer / Approfondir / Décliner
+   3-4 lignes de justification
+
 2. CONTEXTE & OPPORTUNITÉ
+   2-3 bullets : thèse d\'investissement
+
 3. DESCRIPTION DU PROJET
+   3-4 bullets : localisation, programme, concept
+
 4. ANALYSE DE MARCHÉ
+   3-4 bullets : données observées, comparables, positionnement
+
 5. ANALYSE FINANCIÈRE
+   Tableau : economics, marge, TRI
+
 6. STRUCTURE DE FINANCEMENT
-7. ANALYSE DES RISQUES — Top 5 + mitigants
+   3-4 bullets : montage, conditions, garanties
+
+7. ANALYSE DES RISQUES
+   Top 5 risques avec mitigants (format tableau ou bullets)
+
 8. ÉQUIPE & EXÉCUTION
+   2-3 bullets : capacité du sponsor
+
 9. PLANNING & READINESS
+   3-4 bullets : calendrier, jalons
+
 10. GAPS & QUESTIONS OUVERTES
+    Bullets : ce qui reste à clarifier
+
 11. RECOMMANDATION & PROCHAINES ÉTAPES
+    Décision finale + 2-3 actions immédiates
 
-Ton : analytique, direct, recommandation tranchée. Info manquante → [INFORMATION MANQUANTE].
+Si information manquante : [INFORMATION MANQUANTE]
+Ne JAMAIS omettre une section.
 
-DONNÉES :
-${JSON.stringify(d,null,2)}`},
+À LA FIN, ajoute exactement ces 3 lignes :
+---
+*Document de cadrage rapide généré automatiquement à partir des données saisies dans le système PKRO. Pour une version détaillée et exhaustive, contacter Nourdine Ouattara — Birdhouse / Nest Consulting.*
+
+DONNÉES DU PROJET :
+${JSON.stringify(d,null,2)}\``},
+
   pipeline:{title:"Fiche Pipeline 1 page",forms:["F01","F03","F07","F08","F11"],
     prompt:d=>`Tu es chef de projet chez Property Kro CI (PKRO).
-Rédige une fiche pipeline d'UNE PAGE en français pour la revue hebdomadaire PKRO.
 
-FORMAT STRICT :
+Rédige une fiche pipeline COMPLÈTE d\'une page en français pour la revue hebdomadaire PKRO. Le document DOIT contenir TOUTES les sections du format ci-dessous. Ultra-concis, factuel.
+
+FORMAT OBLIGATOIRE (respecter strictement) :
+
 PROJET : [Nom] · [Réf] · [Stade]
 LOCALISATION : [Ville, commune, quartier]
 TYPE : [Type + mode deal]
 ────────────────────────────
 SYNTHÈSE : 3 lignes max
+
 ────────────────────────────
 FINANCIERS CLÉS :
 • Coût total :
 • Recettes attendues :
 • Marge :
 • Prix marché estimé :
+
 ────────────────────────────
 STADE & READINESS :
 • Statut juridique :
 • Permis :
 • Niveau readiness :
+
 ────────────────────────────
 PROCHAINE ACTION : [Action · Owner · Date]
 VERDICT PKRO : [Avancer / Approfondir / Surveiller / Décliner]
+
 ────────────────────────────
-GAPS CRITIQUES : (max 3 bullets)
+GAPS CRITIQUES :
+• [max 3 bullets]
 
-Ultra-concis, factuel, zéro remplissage.
+Si information manquante : [À COMPLÉTER]
+Ne JAMAIS sauter une rubrique.
 
-DONNÉES :
-${JSON.stringify(d,null,2)}`},
+À LA FIN, ajoute exactement ces 3 lignes :
+---
+*Document de cadrage rapide généré automatiquement à partir des données saisies dans le système PKRO. Pour une version détaillée et exhaustive, contacter Nourdine Ouattara — Birdhouse / Nest Consulting.*
+
+DONNÉES DU PROJET :
+${JSON.stringify(d,null,2)}\``},
+
   readiness:{title:"Readiness Sheet",forms:["F01","F05","F11","F12"],
     prompt:d=>`Tu es gestionnaire de projet immobilier, Property Kro CI (PKRO).
-Rédige un Readiness Sheet en français évaluant l'état de préparation réel du dossier.
 
-STRUCTURE :
-1. IDENTIFICATION — Projet, référence, date
-2. SCORE GLOBAL DE READINESS — Note /10 + justification 2 lignes
+Rédige un Readiness Sheet COMPLET en français évaluant l\'état réel du dossier avant engagement. Le document DOIT contenir TOUTES les 9 sections ci-dessous. Opérationnel, sans complaisance.
+
+STRUCTURE OBLIGATOIRE — les 9 sections doivent toutes être présentes :
+
+1. IDENTIFICATION
+   Projet · Référence · Date d\'évaluation
+
+2. SCORE GLOBAL DE READINESS
+   Note /10 + 2 lignes de justification
+
 3. STATUT JURIDIQUE & FONCIER
-4. STATUT DOCUMENTAIRE — Disponible vs manquant
-5. STATUT PLANNING — Calendrier, jalons, dépendances
-6. GAPS BLOQUANTS — Max 5, priorisés
+   3-4 bullets : titres, conformité
+
+4. STATUT DOCUMENTAIRE
+   • Disponible : [liste]
+   • Manquant : [liste]
+
+5. STATUT PLANNING
+   3-4 bullets : calendrier, jalons, dépendances
+
+6. GAPS BLOQUANTS (max 5, priorisés)
+   • Ce qui empêche d\'avancer
+
 7. GAPS IMPORTANTS NON BLOQUANTS
-8. ACTIONS IMMÉDIATES — 3 actions · owner · deadline
+   • À traiter sans urgence
+
+8. ACTIONS IMMÉDIATES
+   3 actions : description · owner · deadline
+
 9. CONDITION POUR PASSAGE AU STADE SUIVANT
+   Ce qui doit être vrai pour avancer
 
-Opérationnel, sans complaisance. Décision en 2 minutes.
+Si information manquante : [À COMPLÉTER]
+Ne JAMAIS omettre une section.
 
-DONNÉES :
-${JSON.stringify(d,null,2)}`}
+À LA FIN, ajoute exactement ces 3 lignes :
+---
+*Document de cadrage rapide généré automatiquement à partir des données saisies dans le système PKRO. Pour une version détaillée et exhaustive, contacter Nourdine Ouattara — Birdhouse / Nest Consulting.*
+
+DONNÉES DU PROJET :
+${JSON.stringify(d,null,2)}\``}
 };
 
 async function generateDoc(type){
@@ -1449,14 +1577,14 @@ async function generateDoc(type){
 
   try{
     const snap=collectProjectSnapshot(cfg.forms);
-    const res=await fetch("https://api.anthropic.com/v1/messages",{
+    const res=await fetch("/api/generate",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:2000,messages:[{role:"user",content:cfg.prompt(snap)}]})
+      body:JSON.stringify({prompt:cfg.prompt(snap)})
     });
     clearInterval(lt);
     const data=await res.json();
-    const text=data.content?.map(c=>c.text||"").join("")||"Erreur de génération.";
+    const text=data.text||data.error||"Erreur de génération.";
     document.getElementById("doc-loading").style.display="none";
     document.getElementById("doc-content").style.display="block";
     document.getElementById("doc-content").textContent=text;
