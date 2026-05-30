@@ -1638,9 +1638,8 @@ async function refreshFromDB(){
     });
     showPill("✓ Synchronisé — "+projects.length+" projet(s)");
     // Re-render current view
-    if(pid) renderFields();
-    renderSidebar();
-    updProg();
+    if(pid){renderFields();updProg();}
+    else{renderProjects();}
   }catch(e){
     showPill("⚠ Erreur de sync","var(--red)");
     console.error("Refresh error:",e);
