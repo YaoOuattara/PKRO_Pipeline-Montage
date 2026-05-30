@@ -245,6 +245,88 @@ textarea::placeholder{color:var(--faint)}
 </head>
 <body>
 
+<!-- ══ ONBOARDING ══════════════════════════════════════════════════════════ -->
+<div id="onboarding-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(12,9,6,0.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:24px">
+  <div style="max-width:480px;width:100%;background:#1C1A14;border:1px solid #3A3527;border-radius:16px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,0.6)">
+    
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#12225A 0%,#1a3070 100%);padding:32px 28px 24px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-20px;right:-20px;width:120px;height:120px;border-radius:50%;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.2)"></div>
+      <div style="position:absolute;bottom:-30px;left:-10px;width:80px;height:80px;border-radius:50%;background:rgba(201,168,76,0.07)"></div>
+      <div style="position:relative">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+          <div style="width:40px;height:40px;background:rgba(201,168,76,0.2);border:1px solid #C9A84C;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px">🏗</div>
+          <div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#C9A84C">Property Kro CI</div>
+            <div style="font-family:Georgia,serif;font-size:18px;font-weight:700;color:#fff;line-height:1.2">Système de Pipeline</div>
+          </div>
+        </div>
+        <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:13px;color:rgba(255,255,255,0.7);line-height:1.6">
+          Plateforme centralisée de collecte, structuration et valorisation des projets immobiliers PKRO.
+        </div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div style="padding:24px 28px">
+      
+      <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#C9A84C;margin-bottom:14px">Ce que vous pouvez faire</div>
+      
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
+        <div style="display:flex;align-items:flex-start;gap:12px">
+          <div style="font-size:16px;margin-top:1px;flex-shrink:0">📋</div>
+          <div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:13px;font-weight:600;color:#F2EDE3">Renseigner les fiches projet</div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#9A9690;line-height:1.5">12 fiches structurées par projet — foncier, juridique, financier, marché et plus</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:12px">
+          <div style="font-size:16px;margin-top:1px;flex-shrink:0">⚡</div>
+          <div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:13px;font-weight:600;color:#F2EDE3">Générer des documents automatiquement</div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#9A9690;line-height:1.5">Investment Teaser · Term Sheet · Investment Memo · Fiche Pipeline · Readiness Sheet</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:12px">
+          <div style="font-size:16px;margin-top:1px;flex-shrink:0">🔄</div>
+          <div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:13px;font-weight:600;color:#F2EDE3">Collaborer en temps réel</div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#9A9690;line-height:1.5">Toutes les saisies sont synchronisées instantanément entre les membres de l'équipe</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:12px">
+          <div style="font-size:16px;margin-top:1px;flex-shrink:0">📄</div>
+          <div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:13px;font-weight:600;color:#F2EDE3">Exporter en Word ou PDF</div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#9A9690;line-height:1.5">Chaque fiche exportable — champs remplis uniquement</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:#252118;border:1px solid #3A3527;border-radius:8px;padding:12px 14px;margin-bottom:20px">
+        <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#9A9690;line-height:1.6">
+          ⭐ Champs marqués <strong style="color:#C9A84C">★</strong> sont prioritaires.<br>
+          💾 Sauvegarde automatique après chaque saisie.<br>
+          🔄 Utilisez le bouton sync pour rafraîchir les données de l'équipe.
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px">
+        <button onclick="closeOnboarding(true)" style="flex:1;padding:13px;background:#C9A84C;color:#0A1640;border:none;border-radius:8px;font-family:'DM Sans',system-ui,sans-serif;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.02em">
+          Accéder aux projets →
+        </button>
+      </div>
+      <div style="text-align:center;margin-top:10px">
+        <button onclick="closeOnboarding(false)" style="background:none;border:none;font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#5C5C54;cursor:pointer;text-decoration:underline">
+          Ne plus afficher ce message
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
 <div class="save-pill" id="save-pill">✓ Sauvegardé</div>
 
 <!-- ══ PROJECTS SCREEN ════════════════════════════════════════════════════════ -->
@@ -1038,7 +1120,7 @@ function renderFields(){
         if(!fieldVal&&fc==="F01"){
           const proj=projects.find(p=>p.id===pid)||{};
           if(key==="nom_du_projet"&&proj.name){fieldVal=proj.name;sv(key,proj.name);}
-          else if(key==="reference_interne_pkro"&&proj.ref){fieldVal=proj.ref;sv(key,proj.ref);}
+          else if((key==="reference_interne_pkro"||key==="reference")&&proj.ref){fieldVal=proj.ref;sv(key,proj.ref);}
           else if(key==="type_de_projet"&&proj.type){fieldVal=proj.type;sv(key,proj.type);}
         }
         inp.value=fieldVal;if(hint)inp.placeholder=hint;
@@ -1271,6 +1353,88 @@ function exportFichePDFClean(){
       }
     </style>
   </head><body>
+
+<!-- ══ ONBOARDING ══════════════════════════════════════════════════════════ -->
+<div id="onboarding-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(12,9,6,0.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:24px">
+  <div style="max-width:480px;width:100%;background:#1C1A14;border:1px solid #3A3527;border-radius:16px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,0.6)">
+    
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#12225A 0%,#1a3070 100%);padding:32px 28px 24px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-20px;right:-20px;width:120px;height:120px;border-radius:50%;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.2)"></div>
+      <div style="position:absolute;bottom:-30px;left:-10px;width:80px;height:80px;border-radius:50%;background:rgba(201,168,76,0.07)"></div>
+      <div style="position:relative">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+          <div style="width:40px;height:40px;background:rgba(201,168,76,0.2);border:1px solid #C9A84C;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px">🏗</div>
+          <div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#C9A84C">Property Kro CI</div>
+            <div style="font-family:Georgia,serif;font-size:18px;font-weight:700;color:#fff;line-height:1.2">Système de Pipeline</div>
+          </div>
+        </div>
+        <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:13px;color:rgba(255,255,255,0.7);line-height:1.6">
+          Plateforme centralisée de collecte, structuration et valorisation des projets immobiliers PKRO.
+        </div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div style="padding:24px 28px">
+      
+      <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#C9A84C;margin-bottom:14px">Ce que vous pouvez faire</div>
+      
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
+        <div style="display:flex;align-items:flex-start;gap:12px">
+          <div style="font-size:16px;margin-top:1px;flex-shrink:0">📋</div>
+          <div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:13px;font-weight:600;color:#F2EDE3">Renseigner les fiches projet</div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#9A9690;line-height:1.5">12 fiches structurées par projet — foncier, juridique, financier, marché et plus</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:12px">
+          <div style="font-size:16px;margin-top:1px;flex-shrink:0">⚡</div>
+          <div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:13px;font-weight:600;color:#F2EDE3">Générer des documents automatiquement</div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#9A9690;line-height:1.5">Investment Teaser · Term Sheet · Investment Memo · Fiche Pipeline · Readiness Sheet</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:12px">
+          <div style="font-size:16px;margin-top:1px;flex-shrink:0">🔄</div>
+          <div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:13px;font-weight:600;color:#F2EDE3">Collaborer en temps réel</div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#9A9690;line-height:1.5">Toutes les saisies sont synchronisées instantanément entre les membres de l'équipe</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:12px">
+          <div style="font-size:16px;margin-top:1px;flex-shrink:0">📄</div>
+          <div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:13px;font-weight:600;color:#F2EDE3">Exporter en Word ou PDF</div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#9A9690;line-height:1.5">Chaque fiche exportable — champs remplis uniquement</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:#252118;border:1px solid #3A3527;border-radius:8px;padding:12px 14px;margin-bottom:20px">
+        <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#9A9690;line-height:1.6">
+          ⭐ Champs marqués <strong style="color:#C9A84C">★</strong> sont prioritaires.<br>
+          💾 Sauvegarde automatique après chaque saisie.<br>
+          🔄 Utilisez le bouton sync pour rafraîchir les données de l'équipe.
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px">
+        <button onclick="closeOnboarding(true)" style="flex:1;padding:13px;background:#C9A84C;color:#0A1640;border:none;border-radius:8px;font-family:'DM Sans',system-ui,sans-serif;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.02em">
+          Accéder aux projets →
+        </button>
+      </div>
+      <div style="text-align:center;margin-top:10px">
+        <button onclick="closeOnboarding(false)" style="background:none;border:none;font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#5C5C54;cursor:pointer;text-decoration:underline">
+          Ne plus afficher ce message
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
     <!-- Header -->
     <div style="display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:12px;border-bottom:3px solid #C9A84C;margin-bottom:20px">
       <div>
@@ -1659,7 +1823,27 @@ async function refreshFromDB(){
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
-load().then(()=>{renderProjects();});
+
+// ── ONBOARDING ────────────────────────────────────────────────────────────────
+function showOnboarding(){
+  try {
+    const dismissed = localStorage.getItem("pkro_onboarding_dismissed");
+    if(!dismissed){
+      const el = document.getElementById("onboarding-overlay");
+      if(el){ el.style.display="flex"; }
+    }
+  } catch(e){}
+}
+
+function closeOnboarding(temporary){
+  const el = document.getElementById("onboarding-overlay");
+  if(el) el.style.display="none";
+  if(!temporary){
+    try { localStorage.setItem("pkro_onboarding_dismissed","1"); } catch(e){}
+  }
+}
+
+load().then(()=>{renderProjects();showOnboarding();});
 // Close drawers on back button (mobile)
 window.addEventListener("popstate",()=>{
   document.querySelectorAll(".overlay.open").forEach(el=>el.classList.remove("open"));
