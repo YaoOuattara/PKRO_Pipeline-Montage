@@ -1449,10 +1449,10 @@ async function generateDoc(type){
 
   try{
     const snap=collectProjectSnapshot(cfg.forms);
-    const res=await fetch("/api/generate",{
+    const res=await fetch("https://api.anthropic.com/v1/messages",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({prompt:cfg.prompt(snap)})
+      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:2000,messages:[{role:"user",content:cfg.prompt(snap)}]})
     });
     clearInterval(lt);
     const data=await res.json();
@@ -1529,4 +1529,3 @@ window.addEventListener("popstate",()=>{
 </script>
 </body>
 </html>
-v6
