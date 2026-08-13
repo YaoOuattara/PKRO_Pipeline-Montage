@@ -1,14 +1,24 @@
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  const ALLOWED = [
+    'https://pkro-pipeline-montage.vercel.app',
+    'https://pipeline.propertykro.com'
+  ];
+  const origin = req.headers.origin;
+  if (ALLOWED.includes(origin)) res.setHeader('Access-Control-Allow-Origin', origin);
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-pkro-token');
 
   if (req.method === 'OPTIONS') { res.status(200).end(); return; }
   if (req.method !== 'POST') { res.status(405).json({ error: 'Method not allowed' }); return; }
 
+  if (req.headers['x-pkro-token'] !== process.env.PKRO_APP_TOKEN) {
+    res.status(401).json({ error: 'Unauthorized' }); return;
+  }
+
   try {
     const { prompt } = req.body;
     if (!prompt) { res.status(400).json({ error: 'Missing prompt' }); return; }
+    if (prompt.length > 12000) { res.status(413).json({ error: 'Prompt too large' }); return; }
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',

@@ -639,7 +639,8 @@ const DEFAULT_CONFIG=[
 
 
 // ── SUPABASE CONFIG ────────────────────────────────────────────────────────────
-const SUPABASE_URL = "https://ynrzlbpyjcrsyhqboxnr.supabase.co";
+const PKRO_APP_TOKEN="b4439065742d3523e6f53c2e6e852a2669bf44135ea705c8";
+    const SUPABASE_URL = "https://ynrzlbpyjcrsyhqboxnr.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucnpsYnB5amNyc3locWJveG5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MzQ2MTEsImV4cCI6MjA5MjAxMDYxMX0.J8N886yVFtr2pKV9boMXd0p32azB7b_MRew7DpXsKuU";
 
 // Supabase REST helpers
@@ -1754,7 +1755,7 @@ async function generateDoc(type){
     const snap=collectProjectSnapshot(cfg.forms);
     const res=await fetch("/api/generate",{
       method:"POST",
-      headers:{"Content-Type":"application/json"},
+      headers:{"Content-Type":"application/json","x-pkro-token":PKRO_APP_TOKEN},
       body:JSON.stringify({prompt:cfg.prompt(snap)})
     });
     clearInterval(lt);
