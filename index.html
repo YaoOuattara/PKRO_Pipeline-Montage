@@ -51,6 +51,7 @@ body.not-admin .proj-icon-btn.del{display:none}
 .icon-btn{width:40px;height:40px;border-radius:8px;border:none;background:rgba(255,255,255,.1);color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s}
 .icon-btn:active{background:rgba(255,255,255,.25)}
 .icon-btn.admin-on{background:var(--admin)}
+body.not-admin #admin-btn{display:none}
 
 /* ══ PROJECTS SCREEN ══════════════════════════════════════════════════════════ */
 #projects-screen .body{flex:1;overflow-y:auto;padding:16px;-webkit-overflow-scrolling:touch}
@@ -1155,6 +1156,10 @@ function updProg(){
 
 // ── ADMIN ─────────────────────────────────────────────────────────────────────
 function toggleAdmin(){
+  if(!currentUser || currentUser.role!=="admin"){
+    alert("La structure des formulaires ne peut etre modifiee que par un administrateur.");
+    return;
+  }
   adminMode=!adminMode;
   document.getElementById("admin-btn").classList.toggle("admin-on",adminMode);
   document.getElementById("admin-banner").classList.toggle("on",adminMode);
