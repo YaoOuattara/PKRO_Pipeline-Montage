@@ -10,24 +10,24 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap');
 :root{
-  --bg:#F2EDE3;--surface:#F8F5EF;--card:#fff;
-  --border:#DDD6C8;--border-dk:#C4BAA8;
-  --ink:#1C1A14;--mid:#56524A;--muted:#96918A;--faint:#C4BFB6;
-  --gold:#8B6A18;--gold-dk:#B8900D;--gold-lt:#F5EDD4;--gold-pale:#FBF8EE;
+  --bg:#F4F5F7;--surface:#FAFBFC;--card:#fff;
+  --border:#DDE1E8;--border-dk:#C3C9D4;
+  --ink:#12225A;--mid:#5B6472;--muted:#8A93AC;--faint:#B4BBC9;
+  --gold:#C9A84C;--gold-dk:#A88B2E;--gold-lt:#F5EDD4;--gold-pale:#FBF8EE;
   --red:#8B1E1E;--red-pale:#FDF3F3;
   --blue:#1A3870;--blue-pale:#EEF2FB;
   --green:#1A5828;--green-pale:#EFF7F2;
-  --grey:#F0EDE6;
-  --admin:#6A1B9A;--admin-pale:#F5EEF9;--admin-lt:#CE93D8;
+  --grey:#EEF0F4;
+  --admin:#0A1640;--admin-pale:#EEF2FB;--admin-lt:#8A93AC;
   --cp-bg:#E8F0FE;--cp-tx:#1A3A8B;
   --af-bg:#E6F4EA;--af-tx:#1A5828;
   --rf-bg:#FDF4E8;--rf-tx:#8B4E00;
   --rj-bg:#FDF3F3;--rj-tx:#8B1E1E;
-  --rc-bg:#F5EEF9;--rc-tx:#5A1A80;
-  --eq-bg:#F5EDD4;--eq-tx:#8B6A18;
+  --rc-bg:#EEF2FB;--rc-tx:#0A1640;
+  --eq-bg:#F5EDD4;--eq-tx:#C9A84C;
   --tap:48px; /* minimum touch target */
   --radius:10px;
-  --shadow:0 2px 16px rgba(28,26,20,.10);
+  --shadow:0 2px 16px rgba(18,34,90,.10);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{height:100%;overflow:hidden}
@@ -214,7 +214,7 @@ textarea::placeholder{color:var(--faint)}
 .fab-title{font-size:10px;font-weight:700;color:var(--admin);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
 
 /* ══ BOTTOM SHEET / DRAWER ══════════════════════════════════════════════════ */
-.overlay{display:none;position:fixed;inset:0;background:rgba(28,26,20,.55);z-index:100}
+.overlay{display:none;position:fixed;inset:0;background:rgba(18,34,90,.55);z-index:100}
 .overlay.open{display:flex;align-items:flex-end}
 .drawer{background:var(--card);border-radius:16px 16px 0 0;width:100%;max-height:85vh;overflow-y:auto;padding:20px 20px 32px;animation:slideUp .25s ease}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
@@ -247,7 +247,7 @@ textarea::placeholder{color:var(--faint)}
 
 <!-- ══ ONBOARDING ══════════════════════════════════════════════════════════ -->
 <div id="onboarding-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(12,9,6,0.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:24px">
-  <div style="max-width:480px;width:100%;background:#1C1A14;border:1px solid #3A3527;border-radius:16px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,0.6)">
+  <div style="max-width:480px;width:100%;background:#12225A;border:1px solid #1E2E63;border-radius:16px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,0.6)">
     
     <!-- Header -->
     <div style="background:linear-gradient(135deg,#12225A 0%,#1a3070 100%);padding:32px 28px 24px;position:relative;overflow:hidden">
@@ -276,35 +276,35 @@ textarea::placeholder{color:var(--faint)}
         <div style="display:flex;align-items:flex-start;gap:12px">
           <div style="font-size:16px;margin-top:1px;flex-shrink:0">📋</div>
           <div>
-            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:13px;font-weight:600;color:#F2EDE3">Renseigner les fiches projet</div>
-            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#9A9690;line-height:1.5">12 fiches structurées par projet — foncier, juridique, financier, marché et plus</div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:13px;font-weight:600;color:#F4F5F7">Renseigner les fiches projet</div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#8A93AC;line-height:1.5">12 fiches structurées par projet — foncier, juridique, financier, marché et plus</div>
           </div>
         </div>
         <div style="display:flex;align-items:flex-start;gap:12px">
           <div style="font-size:16px;margin-top:1px;flex-shrink:0">⚡</div>
           <div>
-            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:13px;font-weight:600;color:#F2EDE3">Générer des documents automatiquement</div>
-            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#9A9690;line-height:1.5">Investment Teaser · Term Sheet · Investment Memo · Fiche Pipeline · Readiness Sheet</div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:13px;font-weight:600;color:#F4F5F7">Générer des documents automatiquement</div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#8A93AC;line-height:1.5">Investment Teaser · Term Sheet · Investment Memo · Fiche Pipeline · Readiness Sheet</div>
           </div>
         </div>
         <div style="display:flex;align-items:flex-start;gap:12px">
           <div style="font-size:16px;margin-top:1px;flex-shrink:0">🔄</div>
           <div>
-            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:13px;font-weight:600;color:#F2EDE3">Collaborer en temps réel</div>
-            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#9A9690;line-height:1.5">Toutes les saisies sont synchronisées instantanément entre les membres de l'équipe</div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:13px;font-weight:600;color:#F4F5F7">Collaborer en temps réel</div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#8A93AC;line-height:1.5">Toutes les saisies sont synchronisées instantanément entre les membres de l'équipe</div>
           </div>
         </div>
         <div style="display:flex;align-items:flex-start;gap:12px">
           <div style="font-size:16px;margin-top:1px;flex-shrink:0">📄</div>
           <div>
-            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:13px;font-weight:600;color:#F2EDE3">Exporter en Word ou PDF</div>
-            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#9A9690;line-height:1.5">Chaque fiche exportable — champs remplis uniquement</div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:13px;font-weight:600;color:#F4F5F7">Exporter en Word ou PDF</div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#8A93AC;line-height:1.5">Chaque fiche exportable — champs remplis uniquement</div>
           </div>
         </div>
       </div>
 
-      <div style="background:#252118;border:1px solid #3A3527;border-radius:8px;padding:12px 14px;margin-bottom:20px">
-        <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#9A9690;line-height:1.6">
+      <div style="background:#0A1640;border:1px solid #1E2E63;border-radius:8px;padding:12px 14px;margin-bottom:20px">
+        <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#8A93AC;line-height:1.6">
           ⭐ Champs marqués <strong style="color:#C9A84C">★</strong> sont prioritaires.<br>
           💾 Sauvegarde automatique après chaque saisie.<br>
           🔄 Utilisez le bouton sync pour rafraîchir les données de l'équipe.
@@ -317,7 +317,7 @@ textarea::placeholder{color:var(--faint)}
         </button>
       </div>
       <div style="text-align:center;margin-top:10px">
-        <button onclick="closeOnboarding(false)" style="background:none;border:none;font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#5C5C54;cursor:pointer;text-decoration:underline">
+        <button onclick="closeOnboarding(false)" style="background:none;border:none;font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#5B6472;cursor:pointer;text-decoration:underline">
           Ne plus afficher ce message
         </button>
       </div>
@@ -1321,24 +1321,24 @@ function exportFichePDFClean(){
       const[status,,label]=f;
       const val=allData[pid]?.[fc]?.[mk(label)]||"";
       if(!val)return;
-      rows+=`<div style="display:flex;margin-bottom:6px;border:1px solid #DDD6C8;border-radius:3px;overflow:hidden">
-        <div style="width:34%;padding:6px 10px;background:${status==="Obligatoire"?"#FBF8EE":"#F8F5EF"};font-size:10px;font-weight:${status==="Obligatoire"?"700":"400"};color:${status==="Obligatoire"?"#8B6A18":"#5C5C54"};flex-shrink:0;border-right:1px solid #DDD6C8">
+      rows+=`<div style="display:flex;margin-bottom:6px;border:1px solid #DDE1E8;border-radius:3px;overflow:hidden">
+        <div style="width:34%;padding:6px 10px;background:${status==="Obligatoire"?"#FBF8EE":"#FAFBFC"};font-size:10px;font-weight:${status==="Obligatoire"?"700":"400"};color:${status==="Obligatoire"?"#C9A84C":"#5B6472"};flex-shrink:0;border-right:1px solid #DDE1E8">
           ${label}${status==="Obligatoire"?" ★":""}
         </div>
-        <div style="padding:6px 10px;font-size:11px;color:#1C1A14;flex:1;white-space:pre-wrap;word-break:break-word">${val}</div>
+        <div style="padding:6px 10px;font-size:11px;color:#12225A;flex:1;white-space:pre-wrap;word-break:break-word">${val}</div>
       </div>`;
     });
     if(!rows)return;
     sections+=`<div style="margin-bottom:18px;page-break-inside:avoid">
-      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#8B6A18;background:#F5EDD4;padding:5px 10px;border:1px solid #DDD6C8;margin-bottom:0">${s.label}</div>
+      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#C9A84C;background:#F5EDD4;padding:5px 10px;border:1px solid #DDE1E8;margin-bottom:0">${s.label}</div>
       ${rows}
     </div>`;
   });
 
   const obs=allData[pid]?.[fc]?.["__obs"];
-  if(obs) sections+=`<div style="margin-top:14px;padding:10px;background:#F0EDE6;border:1px solid #DDD6C8;border-radius:3px">
-    <div style="font-size:9px;font-weight:700;color:#9A9690;text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px">Observations</div>
-    <div style="font-size:11px;color:#1C1A14;white-space:pre-wrap">${obs}</div>
+  if(obs) sections+=`<div style="margin-top:14px;padding:10px;background:#EEF0F4;border:1px solid #DDE1E8;border-radius:3px">
+    <div style="font-size:9px;font-weight:700;color:#8A93AC;text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px">Observations</div>
+    <div style="font-size:11px;color:#12225A;white-space:pre-wrap">${obs}</div>
   </div>`;
 
   const html=`<!DOCTYPE html><html lang="fr"><head>
@@ -1346,7 +1346,7 @@ function exportFichePDFClean(){
     <title>${form.code} — ${proj.name||"Projet"}</title>
     <style>
       *{box-sizing:border-box;margin:0;padding:0}
-      body{font-family:Arial,sans-serif;padding:28px;color:#1C1A14;font-size:12px}
+      body{font-family:Arial,sans-serif;padding:28px;color:#12225A;font-size:12px}
       @media print{
         body{padding:14px}
         @page{margin:1.5cm;size:A4}
@@ -1357,7 +1357,7 @@ function exportFichePDFClean(){
 
 <!-- ══ ONBOARDING ══════════════════════════════════════════════════════════ -->
 <div id="onboarding-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(12,9,6,0.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:24px">
-  <div style="max-width:480px;width:100%;background:#1C1A14;border:1px solid #3A3527;border-radius:16px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,0.6)">
+  <div style="max-width:480px;width:100%;background:#12225A;border:1px solid #1E2E63;border-radius:16px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,0.6)">
     
     <!-- Header -->
     <div style="background:linear-gradient(135deg,#12225A 0%,#1a3070 100%);padding:32px 28px 24px;position:relative;overflow:hidden">
@@ -1386,35 +1386,35 @@ function exportFichePDFClean(){
         <div style="display:flex;align-items:flex-start;gap:12px">
           <div style="font-size:16px;margin-top:1px;flex-shrink:0">📋</div>
           <div>
-            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:13px;font-weight:600;color:#F2EDE3">Renseigner les fiches projet</div>
-            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#9A9690;line-height:1.5">12 fiches structurées par projet — foncier, juridique, financier, marché et plus</div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:13px;font-weight:600;color:#F4F5F7">Renseigner les fiches projet</div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#8A93AC;line-height:1.5">12 fiches structurées par projet — foncier, juridique, financier, marché et plus</div>
           </div>
         </div>
         <div style="display:flex;align-items:flex-start;gap:12px">
           <div style="font-size:16px;margin-top:1px;flex-shrink:0">⚡</div>
           <div>
-            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:13px;font-weight:600;color:#F2EDE3">Générer des documents automatiquement</div>
-            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#9A9690;line-height:1.5">Investment Teaser · Term Sheet · Investment Memo · Fiche Pipeline · Readiness Sheet</div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:13px;font-weight:600;color:#F4F5F7">Générer des documents automatiquement</div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#8A93AC;line-height:1.5">Investment Teaser · Term Sheet · Investment Memo · Fiche Pipeline · Readiness Sheet</div>
           </div>
         </div>
         <div style="display:flex;align-items:flex-start;gap:12px">
           <div style="font-size:16px;margin-top:1px;flex-shrink:0">🔄</div>
           <div>
-            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:13px;font-weight:600;color:#F2EDE3">Collaborer en temps réel</div>
-            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#9A9690;line-height:1.5">Toutes les saisies sont synchronisées instantanément entre les membres de l'équipe</div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:13px;font-weight:600;color:#F4F5F7">Collaborer en temps réel</div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#8A93AC;line-height:1.5">Toutes les saisies sont synchronisées instantanément entre les membres de l'équipe</div>
           </div>
         </div>
         <div style="display:flex;align-items:flex-start;gap:12px">
           <div style="font-size:16px;margin-top:1px;flex-shrink:0">📄</div>
           <div>
-            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:13px;font-weight:600;color:#F2EDE3">Exporter en Word ou PDF</div>
-            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#9A9690;line-height:1.5">Chaque fiche exportable — champs remplis uniquement</div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:13px;font-weight:600;color:#F4F5F7">Exporter en Word ou PDF</div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#8A93AC;line-height:1.5">Chaque fiche exportable — champs remplis uniquement</div>
           </div>
         </div>
       </div>
 
-      <div style="background:#252118;border:1px solid #3A3527;border-radius:8px;padding:12px 14px;margin-bottom:20px">
-        <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#9A9690;line-height:1.6">
+      <div style="background:#0A1640;border:1px solid #1E2E63;border-radius:8px;padding:12px 14px;margin-bottom:20px">
+        <div style="font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#8A93AC;line-height:1.6">
           ⭐ Champs marqués <strong style="color:#C9A84C">★</strong> sont prioritaires.<br>
           💾 Sauvegarde automatique après chaque saisie.<br>
           🔄 Utilisez le bouton sync pour rafraîchir les données de l'équipe.
@@ -1427,7 +1427,7 @@ function exportFichePDFClean(){
         </button>
       </div>
       <div style="text-align:center;margin-top:10px">
-        <button onclick="closeOnboarding(false)" style="background:none;border:none;font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#5C5C54;cursor:pointer;text-decoration:underline">
+        <button onclick="closeOnboarding(false)" style="background:none;border:none;font-family:'DM Sans',system-ui,sans-serif;font-size:11px;color:#5B6472;cursor:pointer;text-decoration:underline">
           Ne plus afficher ce message
         </button>
       </div>
@@ -1440,17 +1440,17 @@ function exportFichePDFClean(){
     <div style="display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:12px;border-bottom:3px solid #C9A84C;margin-bottom:20px">
       <div>
         <div style="font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#C9A84C;margin-bottom:4px">${form.code} — PROPERTY KRO CI</div>
-        <div style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#1C1A14">${form.title}</div>
+        <div style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#12225A">${form.title}</div>
       </div>
       <div style="text-align:right">
         <div style="font-size:12px;font-weight:700">${proj.name||""}</div>
-        <div style="font-size:10px;color:#9A9690">${proj.ref||""} · ${today()}</div>
+        <div style="font-size:10px;color:#8A93AC">${proj.ref||""} · ${today()}</div>
       </div>
     </div>
     <!-- Content -->
-    ${sections||"<p style='color:#9A9690;font-style:italic'>Aucun champ rempli dans cette fiche.</p>"}
+    ${sections||"<p style='color:#8A93AC;font-style:italic'>Aucun champ rempli dans cette fiche.</p>"}
     <!-- Footer -->
-    <div style="margin-top:20px;padding-top:8px;border-top:1px solid #DDD6C8;font-size:9px;color:#9A9690">
+    <div style="margin-top:20px;padding-top:8px;border-top:1px solid #DDE1E8;font-size:9px;color:#8A93AC">
       Property Kro CI — Document confidentiel — Généré le ${today()}
     </div>
     <!-- Auto print -->
