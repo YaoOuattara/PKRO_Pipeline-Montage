@@ -255,11 +255,14 @@ textarea::placeholder{color:var(--faint)}
     <div style="height:1px;background:rgba(201,168,76,.35);margin:28px 0"></div>
     <div id="login-form" style="display:none">
       <div style="font-size:14px;color:rgba(255,255,255,.7);margin-bottom:18px;line-height:1.6">Acc&egrave;s r&eacute;serv&eacute; aux collaborateurs Property Kro.<br>Saisissez votre adresse professionnelle.</div>
-      <input id="login-email" type="email" autocomplete="email" placeholder="prenom@propertykro.com"
+      <input id="login-email" type="email" autocomplete="username" placeholder="prenom@propertykro.com"
         style="width:100%;padding:15px 16px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#fff;font-size:16px;font-family:'DM Sans',sans-serif;outline:none;-webkit-appearance:none"
-        onkeydown="if(event.key==='Enter')sendMagicLink()">
-      <button onclick="sendMagicLink()" id="login-btn"
-        style="width:100%;margin-top:12px;padding:15px;border:none;border-radius:10px;background:#C9A84C;color:#12225A;font-size:15px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer">Recevoir le lien de connexion</button>
+        onkeydown="if(event.key==='Enter')document.getElementById('login-pwd').focus()">
+      <input id="login-pwd" type="password" autocomplete="current-password" placeholder="Mot de passe"
+        style="width:100%;margin-top:10px;padding:15px 16px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#fff;font-size:16px;font-family:'DM Sans',sans-serif;outline:none;-webkit-appearance:none"
+        onkeydown="if(event.key==='Enter')signInPassword()">
+      <button onclick="signInPassword()" id="login-btn"
+        style="width:100%;margin-top:12px;padding:15px;border:none;border-radius:10px;background:#C9A84C;color:#12225A;font-size:15px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer">Se connecter</button>
       <div id="login-msg" style="margin-top:16px;font-size:13px;line-height:1.6;min-height:20px;color:rgba(255,255,255,.75)"></div>
     </div>
     <div id="login-loading" style="font-size:14px;color:rgba(255,255,255,.7)">V&eacute;rification de la session...</div>
@@ -703,6 +706,30 @@ let accessToken = null;
 const SESSION_MAX_MS = 12*60*60*1000;   // expiration 12 h
 
 function authToken(){ return accessToken || SUPABASE_KEY; }
+
+async function signInPassword(){
+  const email=(document.getElementById("login-email").value||"").trim().toLowerCase();
+  const pwd=document.getElementById("login-pwd").value||"";
+  const msg=document.getElementById("login-msg");
+  const btn=document.getElementById("login-btn");
+  if(!email||!email.includes("@")){ msg.style.color="#E9A0A0"; msg.textContent="Adresse email invalide."; return; }
+  if(!pwd){ msg.style.color="#E9A0A0"; msg.textContent="Mot de passe requis."; return; }
+  btn.disabled=true; btn.style.opacity=".6"; btn.textContent="Connexion...";
+  msg.style.color="rgba(255,255,255,.75)"; msg.textContent="";
+  const { data, error } = await supaAuth.auth.signInWithPassword({ email, password:pwd });
+  if(error){
+    btn.disabled=false; btn.style.opacity="1"; btn.textContent="Se connecter";
+    msg.style.color="#E9A0A0";
+    msg.textContent = /invalid login credentials/i.test(error.message||"") ? "Email ou mot de passe incorrect." : "Erreur : "+error.message;
+    return;
+  }
+  try{ localStorage.setItem("pkro_session_start", String(Date.now())); }catch(e){}
+  await loadUserProfile(data.session);
+  document.getElementById("login-overlay").style.display="none";
+  applyRolePermissions();
+  await logAudit("connexion","session",null,null,"");
+  load().then(()=>{renderProjects();showOnboarding();});
+}
 
 async function sendMagicLink(){
   const email=(document.getElementById("login-email").value||"").trim().toLowerCase();
@@ -2068,7 +2095,7 @@ initAuth().then(ok=>{
 });
 // Retour du Magic Link : la session apparait apres redirection
 supaAuth.auth.onAuthStateChange((event)=>{
-  if(event==="SIGNED_IN" && !currentUser){
+  if(event==="SIGNED_IN" && !currentUser && window.location.hash.includes("access_token")){
     try{ localStorage.setItem("pkro_session_start", String(Date.now())); }catch(e){}
     location.replace(window.location.origin + window.location.pathname);
   }
