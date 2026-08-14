@@ -910,7 +910,7 @@ async function dupProject(id){
 
 async function delProject(id){
   const p=projects.find(p=>p.id===id);
-  if(!confirm(`Supprimer "${p?.name}" ?`))return;
+  if(!confirm(`Supprimer definitivement "${p?.name}" ?\n\nToutes les donnees des formulaires F01 a F12 de ce projet seront perdues. Cette action est irreversible.`))return;
   projects=projects.filter(p=>p.id!==id);delete allData[id];
   if(dbReady){
     await sb.del("projects",`id=eq.${id}`);
